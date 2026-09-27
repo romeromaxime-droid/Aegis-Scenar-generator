@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A.E.G.I.S. — Générateur de micro-scénarios v2</title>
+<style>
+:root{--bg:#111315;--panel:#1a1d20;--line:#343a40;--text:#eee9df;--muted:#aaa79f;--accent:#c6a46b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#292d30,#111315 60%);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+header{padding:26px 20px;border-bottom:1px solid var(--line);background:#0b0d0e}header strong{font:700 38px Georgia,serif;letter-spacing:.12em}header small{display:block;color:var(--accent);letter-spacing:.16em;margin-top:3px}
+main{max-width:1000px;margin:25px auto;padding:0 16px}.panel{background:#1a1d20;border:1px solid var(--line);border-radius:12px;padding:22px;margin-bottom:20px;box-shadow:0 15px 40px #0005}
+h1,h2{font-family:Georgia,serif;font-weight:500}h1{margin-top:0}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+label{color:var(--muted);font-size:13px}select{display:block;width:100%;margin-top:6px;padding:11px;background:#101214;color:var(--text);border:1px solid var(--line);border-radius:7px;font:inherit}
+button{border-radius:7px;padding:10px 14px;font:inherit;cursor:pointer}.primary{margin-top:18px;background:var(--accent);border:1px solid var(--accent);font-weight:700}.secondary,.reroll{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.head{display:flex;justify-content:space-between;gap:12px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:15px}.eyebrow{font-size:11px;letter-spacing:.16em;color:var(--accent)}
+.row{display:grid;grid-template-columns:220px 1fr auto;gap:15px;padding:14px 0;border-bottom:1px solid #2b2f32}.name{font-weight:650}.value{color:#ddd8cf}.reroll{padding:4px 9px;font-size:18px}.pitch{margin-top:20px;padding:18px;border-left:3px solid var(--accent);background:#111416}.meta{color:var(--muted);font-size:13px;margin-top:4px}.hidden{display:none}
+@media(max-width:700px){header strong{font-size:30px}.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr auto}.value{grid-column:1/-1}.head{align-items:flex-start}}
+</style>
+</head>
+<body>
+<header><strong>A.E.G.I.S.</strong><small>GÉNÉRATEUR DE MICRO-SCÉNARIOS · V2</small></header>
+<main>
+<section class="panel">
+<h1>Paramètres de mission</h1>
+<div class="grid">
+<label>Nombre d'agents<select id="agents"><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
+<label>Durée<select id="duration"><option value="2">2 h</option><option value="3">3 h</option><option value="4">4 h</option><option value="5">5 h</option></select></label>
+<label>Genre / tonalité
+<select id="genre">
+<option value="Pulp / Action">Pulp / Action</option>
+<option value="Horreur">Horreur</option>
+<option value="Enquête">Enquête</option>
+<option value="Exploration / Découverte / Lore">Exploration / Découverte / Lore</option>
+<option value="Social / Éthique / Dilemme">Social / Éthique / Dilemme</option>
+<option value="Poétique / Étrange">Poétique / Étrange</option>
+<option value="Survie">Survie</option>
+<option value="Thriller / Course contre la montre">Thriller / Course contre la montre</option>
+</select>
+</label>
+</div>
+<button class="primary" id="generate">Générer le scénario</button>
+</section>
+<section class="panel hidden" id="result">
+<div class="head"><div><span class="eyebrow">BILLET DE SCÉNARIO</span><h2 id="title">Mission A.E.G.I.S.</h2><div class="meta" id="meta"></div></div><button class="secondary" id="copy">Copier</button></div>
+<div id="rows"></div><div class="pitch" id="pitch"></div>
+</section>
+</main>
+<script>
+/*
+ A.E.G.I.S. v2
+ Les tables restent celles de la version validée.
+ Le moteur ajoute une couche de cohérence narrative : il ne change jamais
+ les tirages et ne reroll pas les autres éléments lorsqu'une ligne est relancée.
+*/
+const D={
+genres:["Pulp / Action","Horreur","Enquête","Exploration / Découverte / Lore","Social / Éthique / Dilemme","Poétique / Étrange","Survie","Thriller / Course contre la montre"],
+mission:[
+"Enquêter sur une manifestation surnaturelle inhabituelle…","Enquêter sur la disparition inexpliquée de plusieurs personnes…","Intervenir face à un phénomène surnaturel actuellement en cours…","Intervenir pour empêcher une menace surnaturelle de se propager…","Explorer un lieu surnaturel récemment découvert…","Explorer un site ancien dont l’existence vient d’être confirmée…","Explorer un territoire inconnu et en extraire un élément précis…","Récupérer un artefact ou un objet surnaturel avant qu’il ne tombe entre de mauvaises mains…","Récupérer un artefact et le transférer sous contrôle d’A.E.G.I.S.…","Extraire une personne ou une entité d’un environnement devenu dangereux…","Extraire une personne et la mettre sous protection d’A.E.G.I.S.…","Transférer une créature, un objet ou une substance surnaturelle vers un site sécurisé…","Protéger une personne ou une communauté menacée par une présence surnaturelle…","Protéger un site pendant qu’une autre équipe accomplit une opération…","Sécuriser un lieu dont le phénomène surnaturel ne peut plus être contenu…","Confiner une entité ou un phénomène devenu incontrôlable…","Négocier avec une entité ou une communauté surnaturelle…","Établir ou préserver une relation entre A.E.G.I.S. et une puissance surnaturelle…","Enquêter sur un phénomène puis récupérer ce qui en est à l’origine…","Explorer un lieu puis extraire une personne, une entité ou un élément découvert sur place…"],
+situation:["Plusieurs personnes ont disparu inexplicablement.","Une manifestation surnaturelle est signalée dans une zone habitée.","Un phénomène surnaturel se répète selon un schéma impossible.","Un objet ou artefact inconnu vient de refaire surface.","Une personne manifeste un pouvoir surnaturel qu’elle ne contrôle pas.","Une créature surnaturelle vient d’être découverte par le monde humain.","Une communauté locale affirme être menacée par une présence surnaturelle.","Une équipe de recherche ou d’agents a disparu.","Un événement violent laisse des traces surnaturelles.","Un site ancien est découvert à la suite d’un événement inattendu.","Un phénomène connu d’A.E.G.I.S. change soudainement de comportement.","Une personne ou une entité demande directement l’aide d’A.E.G.I.S.","Une faction connue intervient dans un territoire ou un dossier sensible.","Un phénomène commence à dépasser sa zone habituelle.","Une précédente opération d’A.E.G.I.S. a laissé une situation non résolue.","Une personne normalement fiable disparaît ou change de comportement.","Des traces indiquent la reprise d’une activité surnaturelle ancienne.","Un incident apparemment ordinaire révèle une origine surnaturelle.","Deux groupes sont sur le point de s’affronter pour un élément surnaturel.","A.E.G.I.S. reçoit des informations incomplètes sur une menace ou découverte potentiellement majeure."],
+antagonist:["Un criminel isolé.","Un meurtrier rituel ou criminel occultiste.","Une personne dotée d’un pouvoir inexpliqué.","Une créature surnaturelle solitaire.","Une créature ancienne ou antédiluvienne.","Un phénomène surnaturel conscient et hostile.","Un culte ou une secte.","Une société secrète ou organisation occulte.","Un réseau criminel ou mafieux.","Des sorcières ou sorciers dissidents.","L’Assemblée des Sorcières.","Un peuple féerique ou une communauté fae.","Une meute ou communauté de garous.","Une communauté surnaturelle indépendante.","Une faction séparatiste ou de libération.","Une cellule ou un réseau clandestin de la CIA.","Mossad 17.","Ordo Veritas.","Une puissance étrangère ou son service spécialisé.","Une force ou faction inconnue."],
+objective:["Récupérer un artefact, une personne ou une créature.","Prendre le contrôle d’un pouvoir ou phénomène surnaturel.","Détruire un objet, un lieu, une personne ou un phénomène.","Protéger quelque chose que l’antagoniste considère comme essentiel.","Réveiller ou libérer une entité, créature ou force ancienne.","Empêcher quelqu’un d’autre d’obtenir un élément surnaturel.","Exploiter ou militariser un pouvoir ou phénomène surnaturel.","Comprendre un phénomène et apprendre à exploiter ses capacités.","Se venger.","Fuir une menace, une captivité ou une situation surnaturelle.","Étendre un phénomène, une influence, un territoire ou une transformation.","Cacher le phénomène et empêcher sa découverte.","Transformer une personne, une communauté, un lieu ou une créature.","Accomplir un rituel en plusieurs étapes.","Établir un contact avec une entité ou intelligence surnaturelle.","Libérer ou sauver une personne, une créature ou une communauté.","Négocier et obtenir quelque chose d’une puissance surnaturelle.","Reproduire un pouvoir, une technologie ou un phénomène.","Prendre possession d’un territoire ou lieu surnaturel.","Provoquer un événement majeur dont les conséquences dépassent l’antagoniste."],
+object:["Un artefact ancien dont la fonction reste inconnue.","Une arme ou un instrument surnaturel.","Un objet qui modifie ou transmet des souvenirs.","Une technologie antédiluvienne partiellement fonctionnelle.","Un objet contenant ou emprisonnant une entité.","Une substance surnaturelle qui évolue avec le temps.","Un phénomène psychique affectant les personnes.","Une zone où les lois physiques ou naturelles sont altérées.","Une manifestation liée aux rêves ou au sommeil.","Un phénomène de transformation physique ou biologique.","Une ancienne malédiction qui réapparaît.","Un rituel ou dispositif ouvrant un passage vers un autre lieu ou une autre dimension.","Une source d’énergie surnaturelle puissante et instable.","Une entité ou conscience liée à un objet, un lieu ou un réseau.","Un phénomène temporel.","Un lieu possédant une propriété surnaturelle.","Un organisme ou une forme de vie inconnue.","Un fragment d’une ancienne civilisation donnant accès à un savoir oublié.","Un phénomène qui se propage à travers l’environnement ou les êtres vivants.","Un élément surnaturel dont la nature et la fonction ne peuvent être comprises immédiatement."],
+location:["Un lieu public ou urbain ordinaire où le phénomène doit rester discret.","Une propriété privée ou une demeure isolée.","Un bâtiment abandonné ou désaffecté.","Un laboratoire clandestin consacré à l’étude ou à l’exploitation du surnaturel.","Une installation militaire ou de renseignement dissimulant une activité surnaturelle.","Une infrastructure industrielle ou énergétique présentant une activité inhabituelle.","Un musée, une collection privée ou un dépôt contenant un élément surnaturel.","Un site religieux, sanctuaire ou lieu de culte ancien.","Un lieu sacré appartenant à une communauté de sorcières ou de praticiens de la magie.","Une forêt, jungle ou région naturelle abritant une présence surnaturelle.","Une caverne ou un réseau souterrain dont la géographie présente des propriétés inhabituelles.","Un site archéologique récemment découvert.","Un site antédiluvien contenant les vestiges d’une ancienne civilisation.","Une installation ou un laboratoire oublié lié aux anciennes sciences ou technologies.","Un territoire féerique ou le domaine d’un peuple surnaturel.","Un territoire surnaturel revendiqué par une communauté ou une faction.","Une poche extradimensionnelle accessible depuis le monde humain.","Une dimension ou un monde entièrement extérieur à la réalité terrestre connue.","Un lieu où la frontière entre plusieurs réalités est instable.","Un lieu impossible dont l’espace, le temps ou les lois physiques ne fonctionnent pas normalement."],
+character:["Un témoin civil.","Une victime ou une personne ayant survécu à l’événement.","Une personne dotée involontairement d’un pouvoir surnaturel.","Un scientifique ou chercheur.","Un archéologue ou historien.","Un praticien de la magie.","Un membre d’une communauté surnaturelle locale.","Un membre de la faction adverse prêt à parler.","Un ancien membre ou dissident d’une faction adverse.","Un criminel impliqué pour ses propres raisons.","Un agent d’une autre organisation.","Un agent d’A.E.G.I.S. isolé ou porté disparu.","Une personne à protéger ou à extraire.","Une personne détenant l’élément recherché.","Un gardien ou protecteur qui bloque l’accès.","Une créature surnaturelle capable de communiquer.","Une entité ancienne connaissant une partie de la vérité.","Un allié potentiel aux motivations incertaines.","Une victime apparente qui cache son implication.","Un personnage dont l’identité, la nature ou les intentions restent incertaines."],
+power:["Télépathie.","Empathie ou manipulation émotionnelle.","Possession ou contrôle.","Métamorphose.","Régénération ou résistance surnaturelle.","Manipulation ou absorption d’énergie.","Manipulation de la mémoire ou de l’identité.","Pouvoir lié aux rêves et au sommeil.","Manipulation de l’espace ou ouverture de passages.","Manipulation du temps.","Transformation de la matière.","Invocation ou contrôle de créatures.","Contamination ou propagation d’une transformation.","Absorption, vol ou transmission de pouvoirs.","Projection ou déplacement de la conscience.","Manipulation des perceptions ou des sens.","Influence surnaturelle sur la nature ou l’environnement.","Barrière ou protection surnaturelle.","Ancienne magie ou technologie surnaturelle.","Un pouvoir totalement inédit."],
+friction:["Des civils empêchent une intervention ouverte.","Les autorités locales ignorent la situation.","Les autorités locales sont hostiles ou refusent de coopérer.","Les agents doivent rester sous couverture.","Les communications avec le QG sont difficiles ou impossibles.","Le phénomène perturbe les technologies et instruments.","Le lieu est difficile ou dangereux à atteindre.","Les ressources ou équipements disponibles sont limités.","Une autre organisation intervient simultanément.","L’antagoniste sait que les agents arrivent et se prépare.","Le phénomène évolue pendant l’opération.","Une contrainte de temps s’impose.","Les agents doivent protéger une cible tout en poursuivant leur mission.","Une partie du site est inaccessible ou dangereuse.","Les informations disponibles sont incomplètes, contradictoires ou trompeuses.","Les agents doivent respecter les règles d’un territoire ou d’une communauté étrangère.","L’élément surnaturel rend difficile la distinction entre alliés, ennemis et victimes.","Une catastrophe naturelle ou un événement extérieur perturbe l’opération.","Une seconde menace apparaît.","La situation devient incontrôlable et impose de changer de plan."],
+reveal:["L’antagoniste n’est pas celui que les agents pensaient ; quelqu’un d’autre tire les ficelles.","La personne que les agents venaient sauver a provoqué le phénomène.","L’antagoniste tente en réalité d’empêcher une menace plus grave.","L’élément surnaturel est vivant ou conscient et poursuit son propre objectif.","Le phénomène n’est pas local : il existe déjà ailleurs.","La mission actuelle fait partie d’un plan plus vaste.","Une faction inconnue manipule à la fois l’antagoniste et les agents.","L’élément surnaturel a été placé volontairement sur les lieux.","L’événement actuel est directement lié à une ancienne intervention d’A.E.G.I.S.","Le lieu dissimule une seconde menace beaucoup plus importante.","L’antagoniste possède déjà ce qu’il lui faut et recherche seulement le dernier élément.","L’élément recherché est en réalité une personne, une conscience ou une entité.","Le phénomène transforme progressivement les personnes exposées.","Le véritable enjeu est de savoir qui contrôlera le phénomène après l’opération.","Détruire ou contenir le phénomène provoquera une catastrophe ailleurs.","L’antagoniste n’est qu’un intermédiaire utilisé par une puissance surnaturelle supérieure.","La victime apparente participe volontairement à la situation.","Deux factions opposées poursuivent en réalité le même objectif.","Le phénomène est le retour d’un événement ou d’une entité supposément disparu.","Les agents découvrent que leur véritable mission est différente de celle qui leur a été assignée."],
+resolution:["Récupérer et sécuriser l’élément surnaturel.","Détruire l’élément surnaturel.","Confiner la créature ou le phénomène.","Empêcher l’objectif de l’antagoniste.","Extraire la personne ou l’entité concernée.","Protéger une personne, une communauté ou un lieu jusqu’à la fin de la crise.","Empêcher la propagation du phénomène.","Fermer ou stabiliser une brèche ou un passage.","Désactiver une technologie ou un dispositif surnaturel.","Convaincre l’entité ou la faction de renoncer.","Négocier un accord.","Choisir entre plusieurs solutions insatisfaisantes.","Décider du destin d’une créature, d’un phénomène ou d’un objet au-delà du protocole standard.","Laisser la menace ou l’entité partir parce que le confinement serait pire.","Empêcher une catastrophe imminente avant l’échéance.","Sauver des personnes en abandonnant l’objectif initial.","Achever la récupération ou le transfert malgré les autres factions.","Établir la vérité avant de décider du sort de l’élément surnaturel.","Choisir entre le secret d’A.E.G.I.S. et la protection des populations.","Mettre fin à la situation sans connaître les conséquences à long terme."],
+third:["Une seconde équipe d’A.E.G.I.S. avec un objectif différent.","Une autre agence ou organisation humaine veut le même élément.","Une faction surnaturelle rivale.","Un ancien allié de l’antagoniste se retourne contre lui.","Un concurrent veut atteindre l’artefact ou le phénomène avant les agents.","Un individu puissant et indépendant.","Une créature indépendante attaque les deux camps.","Un adversaire secondaire protège l’objectif de l’antagoniste sans appartenir à sa faction.","Un ou plusieurs mercenaires.","Un prisonnier libéré devient imprévisible.","Un témoin ou civil décide d’agir.","Un scientifique veut obtenir les données ou le phénomène.","Une communauté locale défend son territoire et ses intérêts.","Une puissance surnaturelle propose son aide en échange d’un prix.","Un groupe tente de détruire ce que les agents doivent récupérer ou protéger.","Un individu lié au phénomène apparaît et semble pouvoir le contrôler.","Une faction inconnue surveillait déjà l’opération.","Un ancien adversaire d’A.E.G.I.S. intervient contre l’antagoniste.","Un allié potentiel poursuit son propre agenda et peut devenir adversaire.","Une troisième force indépendante est incompatible avec les deux camps."],
+event:["Le phénomène change brutalement de comportement.","La victime disparaît.","L’antagoniste agit plus tôt que prévu.","Le site s’effondre ou devient inaccessible.","Une nouvelle information impose de changer de plan.","Un objectif secondaire devient urgent.","Les agents sont séparés.","Le phénomène commence à se propager.","Une personne jusque-là passive agit de manière inattendue.","Une faction locale intervient.","L’élément essentiel est déplacé ou volé.","Le pouvoir se manifeste avec une intensité imprévue.","Une nouvelle victime apparaît.","Une sortie ou les communications sont coupées.","L’antagoniste propose un marché.","Un allié révèle ses propres intérêts.","Un événement extérieur perturbe l’opération.","Une seconde manifestation surnaturelle apparaît.","Une nouvelle zone est découverte.","Un événement irréversible commence."],
+jurisdiction:["Juridiction directe d’A.E.G.I.S.","État allié coopérant","État étranger avec autorisation officielle","État étranger avec autorisation limitée","Territoire neutre","Intervention non déclarée","Territoire hostile à A.E.G.I.S.","Territoire disputé / juridiction incertaine","Territoire relevant d’une puissance ou communauté surnaturelle","Hors de toute juridiction connue"]
+};
+
+const fields=[
+["mission","Nature de la mission","mission"],["situation","Situation de départ","situation"],["antagonist","Antagoniste / force opposée","antagonist"],["objective","Objectif de l’antagoniste","objective"],["object","Artefact / phénomène / objet","object"],["location","Lieu","location"],["character","Personnage clé","character"],["power","Pouvoir / particularité surnaturelle","power"],["friction","Friction / contrainte opérationnelle","friction"],["reveal","Révélation","reveal"],["resolution","Résolution / enjeu final","resolution"],["third","Intervenant tiers","third"],["event","Événement intermédiaire","event"],["jurisdiction","Juridiction","jurisdiction"]];
+
+const labels={
+mission:"Nature de la mission",situation:"Situation de départ",antagonist:"Antagoniste / force opposée",
+objective:"Objectif de l’antagoniste",object:"Artefact / phénomène / objet",location:"Lieu",character:"Personnage clé",
+power:"Pouvoir / particularité surnaturelle",friction:"Friction / contrainte opérationnelle",reveal:"Révélation",
+resolution:"Résolution / enjeu final",third:"Intervenant tiers",event:"Événement intermédiaire",jurisdiction:"Juridiction"
+};
+
+const $=id=>document.getElementById(id);
+if(!$("genre").options.length){
+  D.genres.forEach(x=>{const o=document.createElement("option");o.value=x;o.textContent=x;$("genre").appendChild(o)});
+}
+let state={};
+
+function pick(k){const a=D[k];return a[Math.floor(Math.random()*a.length)]}
+
+function has(s, terms){s=(s||"").toLowerCase();return terms.some(t=>s.includes(t))}
+function clean(s){return (s||"").replace(/[.…]+$/,"").trim()}
+function lower(s){s=clean(s);return s?s.charAt(0).toLowerCase()+s.slice(1):s}
+function article(s){
+ const x=lower(s);
+ if(/^(un|une|des|l’|l'|la |le |les |du |de la |de l’|de l')/.test(x)) return x;
+ return x;
+}
+
+/* La couche de cohérence. Elle ne remplace aucun résultat tiré :
+   elle choisit seulement comment les résultats s'articulent. */
+function coherence(){
+ const c={};
+ const all=Object.values(state).join(" ").toLowerCase();
+ c.fae=has(all,["peuple féerique","communauté fae","territoire féerique"]);
+ c.memory=has(state.power,["mémoire","identité"]);
+ c.dimension=has(state.location,["poche extradimensionnelle","dimension","réalité"]);
+ c.secret=has(state.resolution,["secret d’a.e.g.i.s."]);
+ c.victim=has(state.character,["victime"]);
+ c.realMission=has(state.reveal,["véritable mission"]);
+ c.cut=has(state.event,["communications","sortie"]);
+ c.horror=$("genre").value==="Horreur";
+ c.ethics=$("genre").value==="Social / Éthique / Dilemme";
+ return c;
+}
+
+function makeTitle(){
+ const c=coherence();
+ if(c.fae&&c.memory) return "Les souvenirs du royaume absent";
+ if(c.dimension&&c.realMission) return "Derrière la porte";
+ if(c.horror&&c.memory) return "Ceux qui se souviennent";
+ if(c.ethics&&c.secret) return "Le prix du secret";
+ if(c.fae) return "Le royaume derrière le monde";
+ if(c.memory) return "Les vies oubliées";
+ if(c.dimension) return "Au-delà du seuil";
+ if(c.horror) return "La présence";
+ return "Dossier A.E.G.I.S.";
+}
+
+function opening(){
+ const c=coherence(), n=+$("agents").value, d=+$("duration").value, g=$("genre").value;
+ let s=`A.E.G.I.S. déploie ${n} agents pour une opération de ${d} heures, dans un registre ${g}. ${clean(state.situation)}`;
+ if(state.mission) s+=` La mission consiste à ${lower(state.mission).replace(/^à /,"")}.`;
+ return s;
+}
+
+function connective(){
+ const c=coherence();
+ let s="";
+ if(c.fae&&c.dimension) s+=" Le lieu n'est pas un simple refuge : il constitue un territoire de la communauté fae, séparé du monde humain par une frontière extradimensionnelle.";
+ else if(c.dimension) s+=" Le lieu constitue un espace séparé du monde humain, dont l'accès et les conditions de sortie ne sont pas garantis.";
+ if(c.memory&&c.victim) s+=" La victime apparente devient rapidement centrale : ses souvenirs ne correspondent pas entièrement à ce qu'elle raconte, et son implication semble liée à la manipulation de la mémoire ou de l'identité.";
+ else if(c.memory) s+=" Les agents comprennent rapidement que les souvenirs et l'identité des personnes impliquées ne peuvent pas être considérés comme fiables.";
+ if(c.fae&&state.objective&&has(state.objective,["sauver","libérer"])) s+=" La communauté fae affirme agir pour sauver ou libérer quelqu'un, ce qui place l'intervention d'A.E.G.I.S. dans une situation moins simple qu'il n'y paraît.";
+ if(state.character) s+=` ${clean(state.character)} détient ou connaît une partie des éléments utiles.`;
+ if(state.power) s+=` ${clean(state.power)} constitue la particularité surnaturelle centrale.`;
+ return s;
+}
+
+function complications(){
+ let s="";
+ if(state.friction) s+=` La mission est compliquée par ${lower(state.friction)}.`;
+ if(state.event) s+=` En cours d'opération, ${lower(state.event)}.`;
+ if(state.third) s+=` Un troisième intervenant entre également dans la situation : ${lower(state.third)}.`;
+ return s;
+}
+
+function climax(){
+ const c=coherence();
+ let s="";
+ if(state.reveal) s+=` La révélation finale est la suivante : ${lower(state.reveal)}.`;
+ if(c.realMission&&c.secret) s+=" Les agents découvrent alors que le secret qu'ils sont censés préserver n'est pas sans conséquence pour les personnes présentes sur place.";
+ if(state.resolution) s+=` La résolution attendue est : ${lower(state.resolution)}.`;
+ return s;
+}
+
+function density(){
+ const n=+$("agents").value;
+ if(n<=3)return "une opposition principale et éventuellement un élément secondaire";
+ if(n===4)return "une opposition principale et un élément secondaire";
+ if(n===5)return "une opposition principale et un à deux éléments secondaires";
+ return "une opposition principale, deux éléments secondaires et éventuellement un mini-boss";
+}
+
+function buildPitch(){
+ const parts=[opening(),connective(),complications(),climax()];
+ let p=parts.filter(Boolean).join(" ");
+ p+=` La densité prévue pour cette équipe est ${density()}.`;
+ return p.replace(/\s+/g," ").trim();
+}
+
+function generate(){
+ if(!$("genre").value) $("genre").value=D.genres[0];
+ state={};
+ const d=+$("duration").value;
+ fields.forEach(([id,,k])=>{
+   if(id==="third"&&d<4)return;
+   if(id==="event"&&d<3)return;
+   state[id]=pick(k);
+ });
+ render();
+ $("result").classList.remove("hidden");
+}
+
+function reroll(id){
+ const f=fields.find(x=>x[0]===id);
+ if(!f)return;
+ state[id]=pick(f[2]);
+ render();
+}
+
+function render(){
+ $("title").textContent=makeTitle();
+ $("meta").textContent=`${$("agents").value} agents · ${$("duration").value} h · ${$("genre").value}`;
+ const rows=$("rows");rows.innerHTML="";
+ fields.forEach(([id,label])=>{
+   if(!state[id])return;
+   const d=document.createElement("div");d.className="row";
+   const name=document.createElement("div");name.className="name";name.textContent=label;
+   const value=document.createElement("div");value.className="value";value.textContent=state[id];
+   const b=document.createElement("button");b.className="reroll";b.textContent="↻";b.onclick=()=>reroll(id);
+   d.append(name,value,b);rows.appendChild(d);
+ });
+ $("pitch").textContent=buildPitch();
+}
+
+$("generate").onclick=generate;
+$("copy").onclick=async()=>{
+ try{await navigator.clipboard.writeText($("pitch").textContent);$("copy").textContent="Copié";setTimeout(()=>$("copy").textContent="Copier",1200)}
+ catch(e){$("copy").textContent="Sélectionnez le texte pour le copier"}
+};
+</script>
+</body>
+</html>
