@@ -1,0 +1,11 @@
+{
+  "name":"A.E.G.I.S. — Générateur de scénarios",
+  "short_name":"A.E.G.I.S.",
+  "start_url":"./test-v4.html",
+  "display":"standalone",
+  "background_color":"#0d1117",
+  "theme_color":"#111111",
+  "icons":[
+    {"src":"aegis-icon.png","sizes":"1024x1024","type":"image/png","purpose":"any maskable"}
+  ]
+}
