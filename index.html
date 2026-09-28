@@ -232,9 +232,9 @@ function render(){
  $('playerMeta').textContent='Joueurs : '+characterSummary();
  const mr=(ob,b,defs)=>defs.map(x=>row(x[1],ob[x[0]],()=>rf(b,x[0])));
  r.append(section('Cadre de mission',null,[row('Nature de la mission',S.mission,()=>rf('mission')),row('Situation de départ',S.situation,()=>rf('situation')),row('Lieu — nature',S.loc.nature,()=>rf('loc','nature')),row('Lieu — fonction',S.loc.fonction,()=>rf('loc','fonction')),row('Lieu — caractéristique',S.loc.feature,()=>rf('loc','feature'))]));
- r.append(section('Antagoniste principal','ant',mr(S.ant,'ant',[['nature','Nature'],['fonction','Fonction'],['faction','Faction'],['rapport','Rapport à la faction'],['objectif','Objectif'],['motivation','Motivation'],['power','Pouvoir / capacité'],['technique','Technique utile'],['knowledge','Connaissance utile'],['particularity','Particularité']]));
- r.append(section('Artefact / phénomène / objet','obj',mr(S.obj,'obj',[['nature','Nature'],['origin','Origine'],['fonction','Fonction'],['link','Lien avec l’affaire'],['manifestation','Manifestation']]));
- r.append(section('Personnage clé','char',mr(S.char,'char',[['nature','Nature'],['fonction','Fonction'],['position','Position dans le conflit'],['objectif','Objectif'],['motivation','Motivation'],['info','Information détenue'],['secret','Secret éventuel']]));
+ r.append(section('Antagoniste principal','ant',mr(S.ant,'ant',[['nature','Nature'],['fonction','Fonction'],['faction','Faction'],['rapport','Rapport à la faction'],['objectif','Objectif'],['motivation','Motivation'],['power','Pouvoir / capacité'],['technique','Technique utile'],['knowledge','Connaissance utile'],['particularity','Particularité']])));
+ r.append(section('Artefact / phénomène / objet','obj',mr(S.obj,'obj',[['nature','Nature'],['origin','Origine'],['fonction','Fonction'],['link','Lien avec l’affaire'],['manifestation','Manifestation']])));
+ r.append(section('Personnage clé','char',mr(S.char,'char',[['nature','Nature'],['fonction','Fonction'],['position','Position dans le conflit'],['objectif','Objectif'],['motivation','Motivation'],['info','Information détenue'],['secret','Secret éventuel']])));
  r.append(section('Friction / contrainte opérationnelle',null,[row('Contrainte',S.friction,()=>rf('friction'))]));
  r.append(section('Révélation',null,[row('Révélation',S.reveal,()=>rf('reveal'))],!o.reveal));
  r.append(section('Résolution / enjeu final',null,[row('Type',S.res.type,()=>rf('res','type')),row('Objectif final',S.res.objective,()=>rf('res','objective')),row('Enjeu',S.res.stakes,()=>rf('res','stakes'))]));
