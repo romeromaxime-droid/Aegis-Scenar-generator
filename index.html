@@ -40,39 +40,71 @@ function generateNpc(){let surprise=$('npcSurprise').checked;let level=surprise?
 function renderNpc(){const n=currentNpc;$('npcName').textContent=n.name;$('npcMeta').textContent=`${n.nature} — ${n.level} · ${n.function} · ${n.faction} — ${n.factionLevel} · ${n.role}`;let pot=n.potentials?`Corps ${n.potentials[0]} · Mobilité ${n.potentials[1]} · Sens ${n.potentials[2]} · Esprit ${n.potentials[3]} · Figure ${n.potentials[4]}`:'Potentiels : non applicables';let skills=n.skills.map(x=>`${esc(x[0])} ${x[1]}`).join(' · ');$('npcStory').innerHTML=`<div class="npc-card"><p><span class="pill">Origine : ${esc(n.origin)}</span><span class="pill">Âge apparent : ${n.age} ans</span><span class="pill">Genre / présentation : ${esc(n.gender)}</span></p><div class="field-title">Potentiels</div><p>${pot}</p><div class="field-title">Compétences</div><p>${skills}</p><div class="field-title">Pouvoir / capacité</div><p>${esc(n.power)} — niveau ${n.powerVal}</p><div class="field-title">Objectif</div><p>${esc(n.objective)}</p><div class="field-title">Motivation</div><p>${esc(n.motivation)}</p><div class="field-title">Particularité</div><p>${esc(n.particularity)}</p><div class="field-title">Bannière / emblème de faction</div><p class="symbol">${esc(FACTIONS[n.faction].s)} — ${esc(FACTIONS[n.faction].c)}</p><div class="field-title">Biographie</div><p>${esc(biography(n))}</p></div>`;$('npcResult').classList.remove('hidden')}
 function npcSheet(){const n=currentNpc;return `FICHE DE PNJ — A.E.G.I.S.\n\n${n.name}\nNature : ${n.nature} — ${n.level}\nFonction : ${n.function}\nFaction : ${n.faction} — ${n.factionLevel}\nRôle dans le conflit : ${n.role}\nOrigine : ${n.origin}\nÂge apparent : ${n.age} ans\nGenre / présentation : ${n.gender}\n\nPotentiels : ${n.potentials?`Corps ${n.potentials[0]} · Mobilité ${n.potentials[1]} · Sens ${n.potentials[2]} · Esprit ${n.potentials[3]} · Figure ${n.potentials[4]}`:'Non applicables'}\n\nCompétences :\n${n.skills.map(x=>`- ${x[0]} ${x[1]}`).join('\n')}\n\nPouvoir / capacité : ${n.power}\nNiveau : ${n.powerVal}\n\nObjectif : ${n.objective}\nMotivation : ${n.motivation}\nParticularité : ${n.particularity}\n\nBannière / emblème : ${FACTIONS[n.faction].s}; ${FACTIONS[n.faction].c}\n\nBiographie : ${biography(n)}`}
 function npcPrompt(){const n=currentNpc;return `Tu es auteur et concepteur de PNJ pour A.E.G.I.S., jeu de rôle d’action surnaturelle. À partir de la fiche ci-dessous, produis UNE SEULE fiche de PNJ complète et directement exploitable. Ne crée aucun scénario. Ne remplace ni la Nature, ni le niveau, ni la Fonction, ni la Faction, ni le rôle, ni les mécaniques. Conserve les Potentiels, compétences, niveau de pouvoir, objectif, motivation et particularité. Développe seulement les détails narratifs et visuels cohérents. Ajoute une biographie de 2 à 3 lignes. L’origine géographique doit surtout transparaître dans le nom/prénom, la langue, quelques détails culturels et la tenue ; elle ne doit jamais imposer une couleur de peau ou une apparence ethnique déterministe.\n\n${npcSheet()}`}
-function artPrompt(){const n=currentNpc;let nonHuman=!['Humain','Humain altéré par le surnaturel','Humain altéré biologiquement','Humain altéré technologiquement'].includes(n.nature);return `ILLUSTRATION DE PNJ A.E.G.I.S. — ${n.name}
+function artPrompt(){const n=currentNpc;const nonHuman=!['Humain','Humain altéré par le surnaturel','Humain altéré biologiquement','Humain altéré technologiquement'].includes(n.nature);const skills=n.skills.map(x=>`${x[0]} ${x[1]}`).join(' · ');const levelGuide={Faible:'Le personnage doit rester crédible, relativement ordinaire et peu équipé. Évite toute mise en scène de héros d’élite ou de boss. Le niveau faible ne signifie pas faible physiquement : il indique surtout une expérience, une maîtrise ou des ressources limitées.',Moyen:'Le personnage peut présenter une expérience et une spécialisation clairement visibles, avec un équipement cohérent et une présence plus affirmée.',Fort:'Le personnage peut être très spécialisé et expérimenté, avec une maîtrise visible de son domaine et un environnement ou équipement particulièrement cohérent, sans devenir automatiquement surhumain ou spectaculaire.'}[n.level]||'';return `ILLUSTRATION DE PNJ A.E.G.I.S. — ${n.name}
 
 IMPORTANT — CE PROMPT EST DESTINÉ À ÊTRE UTILISÉ APRÈS LE DÉVELOPPEMENT DE LA FICHE DU PNJ.
-Le message immédiatement précédent peut contenir la fiche de PNJ développée par ChatGPT. Cette fiche développée constitue la SOURCE DE VÉRITÉ pour l’apparence et la représentation du personnage.
+Le message immédiatement précédent peut contenir la fiche de PNJ développée par ChatGPT. Cette fiche développée constitue la SOURCE DE VÉRITÉ PRINCIPALE pour l’apparence, la mise en scène et la représentation du personnage.
 
-Lis entièrement cette fiche précédente avant de composer l’image. Conserve son identité, son apparence, son âge apparent, sa présentation de genre, sa Nature, sa Fonction, sa Faction, son Rôle, ses armes/accessoires, ses pouvoirs et les détails visuels établis. Ne transforme pas le personnage en un PNJ générique et n’invente pas une autre identité.
+Lis entièrement cette fiche précédente avant de composer l’image. Conserve strictement son identité, son apparence, son âge apparent, sa présentation de genre, sa Nature, sa Fonction, sa Faction, son Rôle, ses armes/accessoires, son pouvoir, sa particularité et les détails visuels établis. Ne transforme pas le personnage en PNJ générique et n’invente pas une autre identité.
+
+HIÉRARCHIE DE CONCEPTION — OBLIGATOIRE
+1. Fiche développée précédente : source de vérité pour les détails narratifs et visuels déjà établis.
+2. Données mécaniques ci-dessous : elles ne doivent jamais être modifiées ni contredites.
+3. Traduction visuelle : transforme les données mécaniques et narratives en vêtements, posture, environnement, accessoires et mise en scène.
 
 DONNÉES DE RÉFÉRENCE DU GÉNÉRATEUR
 Nom : ${n.name}
 Nature : ${n.nature}
-Niveau : ${n.level}
+Niveau général : ${n.level}
 Fonction : ${n.function}
 Faction : ${n.faction}
+Niveau de faction : ${n.factionLevel}
 Rôle : ${n.role}
-Origine : ${n.origin}
-Âge apparent initial : ${n.age} ans
-Présentation de genre initiale : ${n.gender}
-Pouvoir / capacité : ${n.power}
+Origine géographique : ${n.origin}
+Âge apparent : ${n.age} ans
+Genre / présentation : ${n.gender}
+Potentiels : ${n.potentials?`Corps ${n.potentials[0]} · Mobilité ${n.potentials[1]} · Sens ${n.potentials[2]} · Esprit ${n.potentials[3]} · Figure ${n.potentials[4]}`:'non applicables'}
+Compétences : ${skills}
+Pouvoir / capacité : ${n.power} — niveau ${n.powerVal}
+Objectif : ${n.objective}
+Motivation : ${n.motivation}
+Particularité : ${n.particularity}
+
+TRADUCTION VISUELLE OBLIGATOIRE
+Nature : la Nature doit influencer l’apparence générale. ${nonHuman?'Pour cette Nature, ne pas donner une apparence humaine générique : représenter la forme véritable, surnaturelle ou de combat du personnage conformément à la fiche développée.':''}
+Niveau général : ${levelGuide}
+Fonction : ${n.function} doit déterminer principalement la tenue, le cadre professionnel et les objets de travail.
+Faction : ${n.faction} doit déterminer les codes vestimentaires et institutionnels visibles, sans transformer le personnage en uniforme générique.
+Rôle : ${n.role} doit influencer la posture, l’attitude et la situation représentée. Ne pas caricaturer le rôle.
+Compétences : elles peuvent se traduire par des armes, accessoires ou attitudes seulement lorsqu’ils sont visuellement pertinents. Ne rajoute pas d’équipement majeur non justifié.
+Pouvoir : la manifestation du pouvoir doit être simple, claire et immédiatement lisible. Elle peut prendre la forme d’une aura, lumière, ombre, énergie, feu, électricité, effet féerique, effet spirituel, etc. Évite la surcharge visuelle.
+Objectif / motivation : ils peuvent influencer subtilement l’attitude, la situation ou les éléments de décor, mais ne doivent pas être écrits dans l’image.
+Particularité : elle doit produire au moins UN INDICE VISUEL concret dans la scène. Si la particularité est secrète, l’indice doit rester subtil et ne pas révéler directement le secret.
+
+NIVEAU ET PRÉSENCE
+Ne confonds jamais niveau général et puissance physique. Un personnage Faible peut être âgé, imposant, élégant, inquiétant ou physiquement compétent si la fiche le justifie. Le niveau indique surtout le degré global de ressources, d’expérience et de maîtrise représenté par la mise en scène.
+
+ORIGINE GÉOGRAPHIQUE — RÈGLE ABSOLUE
+L’origine géographique ne détermine JAMAIS la couleur de peau, l’ethnicité, les traits du visage ou une apparence physique supposée. Ne déduis aucune apparence ethnique à partir de l’origine. Utilise l’origine principalement pour le nom/prénom, la langue éventuelle, quelques références culturelles, l’architecture ou la tenue lorsque cela est pertinent.
 
 DIRECTION ARTISTIQUE
-Illustration pulp franco-belge contemporaine, fantastique/surnaturel sombre, réalisme stylisé, clair-obscur, palette noir, bleu nuit, gris pierre, bronze vieilli avec touches de rouge/orange.
+Illustration pulp franco-belge contemporaine, fantastique/surnaturel sombre, réalisme stylisé, clair-obscur, palette noir, bleu nuit, gris pierre, bronze vieilli avec touches de rouge/orange. Le rendu doit ressembler à une illustration de personnage d’un jeu de rôle haut de gamme, pas à une photographie ni à une affiche générique de super-héros.
 
-${nonHuman?'Pour cette Nature, ne pas donner une apparence humaine générique : représenter la forme véritable, surnaturelle ou de combat du personnage, conformément à la fiche développée.':''}
-
-Vêtements déterminés principalement par Fonction + Faction + Rôle. Les armes et accessoires doivent découler des compétences, du pouvoir et de la fonction. La manifestation du pouvoir doit rester simple, claire et immédiatement lisible : aura, ombre, lumière, énergie, feu, électricité, effet nécromantique, etc., sans surcharge visuelle.
+VÊTEMENTS ET ACCESSOIRES
+Les vêtements sont déterminés principalement par Fonction + Faction + Rôle + origine culturelle pertinente. Les armes et accessoires doivent découler des compétences, du pouvoir et de la fonction. Ne transforme pas systématiquement un PNJ en combattant lourdement équipé.
 
 EMBLÈME DE FACTION
-Intégrer naturellement dans le décor une bannière, un fanion, un écusson ou un élément architectural portant l’emblème de ${n.faction}. Emblème à représenter comme une ICÔNE GRAPHIQUE TRÈS SIMPLIFIÉE, lisible en quelques formes et couleurs, sans chercher une reproduction parfaitement exacte d’un logo officiel.
+Intégrer naturellement dans le décor une bannière, un fanion, un écusson ou un élément architectural portant l’emblème de ${n.faction}. L’emblème doit être traité comme une ICÔNE GRAPHIQUE TRÈS SIMPLIFIÉE, lisible en quelques formes et couleurs, même lorsqu’il s’inspire d’un logo réel. Ne cherche pas une reproduction parfaitement exacte.
 Description de l’emblème : ${FACTIONS[n.faction].s}.
 Couleurs / bannière : ${FACTIONS[n.faction].c}.
 
 COMPOSITION
-Portrait ou plan américain/full body selon ce qui sert le mieux le personnage. Le personnage doit être le sujet principal. Pas de logo A.E.G.I.S. en haut. Sous l’illustration, inscrire uniquement « ${n.name} » comme titre pulp. Aucun autre texte.`}
+Portrait, plan américain ou full body selon ce qui sert le mieux le personnage. Le personnage doit rester le sujet principal. La scène doit raconter quelque chose sur CE PNJ et pas seulement montrer sa profession. Fais apparaître visuellement au moins trois éléments parmi : Nature, Fonction, Faction, Rôle, pouvoir, particularité, objectif/motivation.
+
+Ne rends pas le personnage automatiquement séduisant, musclé, héroïque, menaçant ou charismatique : son apparence doit découler de la fiche. Évite les clichés visuels de « méchant » ; lorsque le personnage est antagoniste, fais plutôt sentir son opposition par la situation, la posture, les indices narratifs et le contexte.
+
+Pas de logo A.E.G.I.S. en haut. Sous l’illustration, inscrire uniquement « ${n.name} » comme titre pulp. Aucun autre texte.`}
+
 function copy(text,btn,label){navigator.clipboard?.writeText(text).catch(()=>{});btn.textContent='Copié';setTimeout(()=>btn.textContent=label,1200)}
 $('generateNpc').onclick=generateNpc;$('copyNpc').onclick=function(){copy(npcSheet(),this,'Copier la fiche')};$('copyNpcPrompt').onclick=function(){copy(npcPrompt(),this,'Copier prompt PNJ')};$('copyNpcArt').onclick=function(){copy(artPrompt(),this,'Copier prompt illustration PNJ')};
 const SM={mission:['Enquêter sur une manifestation surnaturelle inhabituelle.','Intervenir face à un phénomène surnaturel en cours.','Récupérer un artefact surnaturel avant qu’il ne tombe entre de mauvaises mains.','Protéger une personne ou une communauté menacée.','Négocier avec une entité ou une communauté surnaturelle.'],situation:['Plusieurs personnes ont disparu inexplicablement.','Une manifestation surnaturelle est signalée dans une zone habitée.','Un objet ou artefact inconnu vient de refaire surface.','Une communauté locale affirme être menacée.','Une faction connue intervient dans un territoire sensible.'],friction:['un terrain hostile','une faction rivale','un phénomène qui s’intensifie','des informations contradictoires','une contrainte diplomatique'],reveal:['le phénomène a une origine plus ancienne que prévu','un acteur local poursuivait un objectif différent','l’artefact est lié à une histoire oubliée'],res:['Neutralisation',['contenir la menace','récupérer l’artefact','protéger les civils','ouvrir une négociation'],['la survie des personnes impliquées','la stabilité locale','la confidentialité d’A.E.G.I.S.']]};
