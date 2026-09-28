@@ -33,6 +33,8 @@ button{border-radius:7px;padding:9px 13px;font:inherit;cursor:pointer}
 .story h3{margin:0 0 5px}.story p{margin:0 0 15px;color:#202020}
 .hidden{display:none}.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .smallbtn{width:auto;margin:0;padding:9px 12px}
+.imagebtn{border-color:#8b1e1e;color:#8b1e1e;font-weight:750}
+@media(max-width:700px){.imagebtn{width:100%}}
 .brand{text-align:center;border-bottom:2px solid #8a6426;padding:4px 0 18px;margin-bottom:16px}
 .brand-logo{display:block;width:min(430px,100%);max-height:300px;object-fit:contain;margin:0 auto 8px;border-radius:8px}
 .brand-title{font-family:Georgia,"Times New Roman",serif;letter-spacing:.18em;font-size:28px;color:#171717;font-weight:700}
@@ -88,6 +90,7 @@ button{border-radius:7px;padding:9px 13px;font:inherit;cursor:pointer}
 <div class="actions">
 <button class="secondary" id="copy">Copier le billet</button>
 <button class="primary smallbtn" id="copyPrompt">Copier billet + prompt</button>
+<button class="secondary smallbtn imagebtn" id="copyImagePrompt">Copier prompt illustration</button>
 </div></div>
 <div id="rows"></div><div class="story" id="story"></div>
 </section>
@@ -351,13 +354,7 @@ LIBERTÉ DES JOUEURS
 Ne suppose jamais que les agents combattront, suivront exactement les indices ou accepteront une solution proposée.
 
 ILLUSTRATION DE COUVERTURE
-Après le scénario, génère également une illustration de couverture directement liée à cette mission.
-
-${ART}
-
-Utilise impérativement les personnages joueurs sélectionnés et leurs descriptions visuelles. Ne remplace jamais un personnage sélectionné par un autre. Si plusieurs agents sont représentés, le nombre doit correspondre au groupe sélectionné. Aucun personnage n’est automatiquement central : compose l’image selon le scénario.
-
-L’image doit montrer le concept central, le lieu, l’atmosphère et la menace ou le phénomène surnaturel sans révéler la résolution, le véritable coupable, une identité secrète ou un retournement final. Un élément de fin peut être omis, partiellement cadré ou rendu non reconnaissable.
+La génération de l’illustration est séparée du présent prompt. Ce prompt sert uniquement à produire le scénario complet. Le bouton « Copier prompt illustration » de l’application produit séparément le prompt destiné à la création de la couverture.
 
 À la fin, ajoute « Points à improviser » avec uniquement les détails librement adaptables par le MJ.
 
@@ -366,6 +363,78 @@ Voici le billet A.E.G.I.S. à développer :
 --- DÉBUT DU BILLET ---
 ${billet}
 --- FIN DU BILLET ---`
+}
+
+function illustrationPrompt(){
+ const selected=getSelectedPlayers();
+ const chars=selected.map((k,i)=>`JOUEUR ${i+1} — ${CHARACTERS[k].fullName}
+${CHARACTERS[k].visual}`).join('\n\n');
+
+ const g=$('genre').value;
+ const duration=$('duration').value;
+ const mission=S.mission || '';
+ const situation=S.situation || '';
+ const antagonist=S.ant || {};
+ const object=S.obj || {};
+ const loc=S.loc || {};
+
+ return `Tu es illustrateur de couvertures pour A.E.G.I.S., un jeu de rôle d’action surnaturelle.
+
+Crée UNE SEULE illustration de couverture pour cette mission.
+
+DONNÉES DE LA MISSION
+Nombre d’agents : ${selected.length}
+Durée : ${duration} h
+Genre / tonalité : ${g}
+Mission : ${mission}
+Situation : ${situation}
+
+LIEU
+Nature : ${loc.nature || ''}
+Fonction : ${loc.fonction || ''}
+Caractéristique : ${loc.feature || ''}
+
+FORCE OPPOSÉE
+Nature : ${antagonist.nature || ''}
+Fonction : ${antagonist.fonction || ''}
+Pouvoir / capacité : ${antagonist.power || ''}
+Technique : ${antagonist.technique || ''}
+Particularité : ${antagonist.particularity || ''}
+
+ARTEFACT / PHÉNOMÈNE / OBJET
+Nature : ${object.nature || ''}
+Origine : ${object.origin || ''}
+Fonction : ${object.fonction || ''}
+Manifestation : ${object.manifestation || ''}
+
+PERSONNAGES JOUEURS — À RESPECTER IMPÉRATIVEMENT
+${chars}
+
+DIRECTION ARTISTIQUE FIXE — A.E.G.I.S.
+${ART}
+
+COMPOSITION
+Créer une véritable couverture de jeu de rôle, avec une composition claire et lisible.
+Les personnages sélectionnés doivent être reconnaissables et conserver exactement leurs caractéristiques physiques, morphologiques, vestimentaires et leurs marqueurs visuels.
+Le nombre de personnages représentés doit correspondre exactement au groupe sélectionné : ${selected.length}.
+Ne remplacer aucun personnage par un personnage générique.
+Aucun personnage n’est automatiquement le héros central : la composition dépend du concept de la mission.
+Mettre en scène le lieu, l’atmosphère et le phénomène ou la menace surnaturelle.
+Privilégier une composition pulp forte, lisible, avec quelques éléments secondaires de décor ou de menace, sans surcharge.
+
+SPOILERS
+Ne montrer ni la résolution, ni le véritable coupable si celui-ci est secret, ni une identité secrète, ni le retournement final.
+Les éléments révélés seulement au MJ doivent être absents, masqués ou rendus non reconnaissables.
+
+TEXTE DANS L’IMAGE
+Logo A.E.G.I.S. en haut.
+Titre du scénario en bas : « ${$('title').textContent || 'Dossier A.E.G.I.S.'} »
+Aucune autre écriture.
+
+FORMAT
+Une seule image.
+Illustration de couverture verticale.
+Pas de planche, pas de série d’images, pas de storyboard, pas de collage.`;
 }
 
 async function copyText(text,button,label){
@@ -377,6 +446,10 @@ async function copyText(text,button,label){
 $('generate').onclick=()=>{try{generateScenario()}catch(e){$('result').classList.remove('hidden');$('story').innerHTML='<h3>Erreur</h3><p>'+esc(e.message)+'</p>'}};
 $('copy').onclick=function(){copyText($('story').innerText,this,'Copier le billet')};
 $('copyPrompt').onclick=function(){copyText(developmentPrompt($('story').innerText),this,'Copier billet + prompt')};
+$('copyImagePrompt').onclick=function(){
+ try{copyText(illustrationPrompt(),this,'Copier prompt illustration')}
+ catch(e){$('story').innerHTML='<h3>Erreur</h3><p>'+esc(e.message)+'</p>'}
+};
 $('agents').onchange=updatePlayerSelectors;
 updatePlayerSelectors();
 </script>
