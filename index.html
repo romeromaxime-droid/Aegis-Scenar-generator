@@ -57,9 +57,23 @@ button{border-radius:7px;padding:9px 13px;font:inherit;cursor:pointer}
 
 <main>
 <div class="tabs">
-<button type="button" class="tab active" data-tab="scenarioTab">Générateur de scénario</button>
-<button type="button" class="tab" data-tab="npcTab">Générateur de PNJ</button>
+<button type="button" class="tab active" data-tab="scenarioTab" onclick="showAegisTab('scenarioTab')">Générateur de scénario</button>
+<button type="button" class="tab" data-tab="npcTab" onclick="showAegisTab('npcTab')">Générateur de PNJ</button>
 </div>
+<script>
+function showAegisTab(tabId){
+  var scenario=document.getElementById('scenarioTab');
+  var npc=document.getElementById('npcTab');
+  if(!scenario || !npc) return;
+  scenario.style.display = tabId==='scenarioTab' ? 'block' : 'none';
+  npc.style.display = tabId==='npcTab' ? 'block' : 'none';
+  scenario.classList.toggle('hidden', tabId!=='scenarioTab');
+  npc.classList.toggle('hidden', tabId!=='npcTab');
+  document.querySelectorAll('.tab').forEach(function(btn){
+    btn.classList.toggle('active', btn.getAttribute('data-tab')===tabId);
+  });
+}
+</script>
 <section id="scenarioTab">
 <section class="panel">
 <h1>Paramètres de mission</h1>
@@ -101,7 +115,7 @@ button{border-radius:7px;padding:9px 13px;font:inherit;cursor:pointer}
 
 
 </section>
-<section id="npcTab" class="hidden">
+<section id="npcTab" class="hidden" style="display:none">
 <section class="panel">
 <h1>Générateur de PNJ</h1>
 <p class="hint">Impose certains paramètres et laisse les autres aléatoires, ou utilise « Surprise totale ». Le rôle est contextuel et distinct de la fonction.</p>
@@ -568,10 +582,15 @@ async function copyText(text,button,label){
 $('generate').onclick=()=>{try{generateScenario()}catch(e){$('result').classList.remove('hidden');$('story').innerHTML='<h3>Erreur</h3><p>'+esc(e.message)+'</p>'}};
 $('copy').onclick=function(){copyText($('story').innerText,this,'Copier le billet')};
 $('copyPrompt').onclick=function(){copyText(developmentPrompt($('story').innerText),this,'Copier billet + prompt')};
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById('scenarioTab').classList.toggle('hidden',b.dataset.tab!=='scenarioTab');document.getElementById('npcTab').classList.toggle('hidden',b.dataset.tab!=='npcTab')});
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>showAegisTab(b.dataset.tab)));
 $('agents').onchange=updatePlayerSelectors;
-npcInit();
+try{npcInit()}catch(e){
+ console.error('A.E.G.I.S. — erreur d’initialisation du générateur de PNJ',e);
+ const h=$('npcOriginHint');
+ if(h) h.textContent='Erreur d’initialisation du générateur de PNJ : '+e.message;
+}
 updatePlayerSelectors();
+showAegisTab('scenarioTab');
 </script>
 </body>
 </html>
