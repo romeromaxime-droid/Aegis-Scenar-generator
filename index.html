@@ -99,6 +99,8 @@ button{border-radius:7px;padding:9px 13px;font:inherit;cursor:pointer}
 <div id="rows"></div><div class="story" id="story"></div>
 </section>
 
+
+</section>
 <section id="npcTab" class="hidden">
 <section class="panel">
 <h1>Générateur de PNJ</h1>
@@ -140,7 +142,6 @@ button{border-radius:7px;padding:9px 13px;font:inherit;cursor:pointer}
 <div class="head"><div><span class="eyebrow">FICHE PNJ</span><h2 id="npcTitle">PNJ A.E.G.I.S.</h2></div>
 <div class="actions"><button type="button" class="secondary" id="copyNPC">Copier la fiche</button><button type="button" class="primary smallbtn" id="copyNPCPrompt">Copier le prompt PNJ</button></div></div>
 <div id="npcRows"></div>
-</section>
 </section>
 </section>
 </main>
@@ -306,7 +307,7 @@ function npcInit(){
  fill('npcNature',NPC_NATURES.map(x=>x[0]));fill('npcFunction',Object.keys(NPC_FUNCTIONS));fill('npcFaction',Object.keys(NPC_FACTIONS));fill('npcRole',NPC_ROLES);fill('npcPowerType',NPC_POWER_TYPES);npcUpdateOrigins();
  $('npcFaction').onchange=npcUpdateOrigins;$('generateNPC').onclick=()=>{window.currentNPC=npcGenerate({level:$('npcLevel').value,nature:$('npcNature').value,function:$('npcFunction').value,faction:$('npcFaction').value,factionLevel:$('npcFactionLevel').value,role:$('npcRole').value,powerType:$('npcPowerType').value,origin:$('npcOrigin').value});npcRender(window.currentNPC)};
  $('surpriseNPC').onclick=()=>{window.currentNPC=npcGenerate({},true);npcRender(window.currentNPC);$('npcFaction').value=window.currentNPC.fac;npcUpdateOrigins();$('npcOrigin').value=window.currentNPC.origin};
- $('copyNPC').onclick=function(){copyText(npcText(window.currentNPC),this,'Copier la fiche')};$('copyNPCPrompt').onclick=function(){copyText(npcPrompt(window.currentNPC),this,'Copier le prompt PNJ')};
+ $('copyNPC').onclick=function(){if(window.currentNPC)copyText(npcText(window.currentNPC),this,'Copier la fiche')};$('copyNPCPrompt').onclick=function(){if(window.currentNPC)copyText(npcPrompt(window.currentNPC),this,'Copier le prompt PNJ')};
 }
 function npcUpdateOrigins(){const fac=$('npcFaction').value;if(fac==="random"){$('npcOrigin').innerHTML='<option value="random">Selon la faction</option>';$('npcOriginHint').textContent="L’origine sera choisie selon la faction tirée.";return}const arr=npcOriginsFor(fac);$('npcOrigin').innerHTML='<option value="random">Selon la faction</option>'+arr.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");$('npcOriginHint').textContent=NPC_FACTIONS[fac].nameRule||"Origine utilisée principalement pour guider le nom et le contexte."}
 function npcScenarioGenerate(){
@@ -389,11 +390,21 @@ function section(title,id,rows,opt=false){
  h.append(t,b);s.append(h);rows.forEach(r=>s.append(r));return s
 }
 function rf(block,field){
- const maps={ant:{nature:'nature',fonction:'fonction',faction:'faction',rapport:'rapport',objectif:'objectif',motivation:'motivation',power:'power',technique:'technique',knowledge:'knowledge',particularity:'particularity'},
- obj:{nature:'objectNature',origin:'objectOrigin',fonction:'objectFunction',link:'objectFunction',manifestation:'manifestation'},
- char:{nature:'nature',fonction:'fonction',position:'thirdRole',objectif:'objectif',motivation:'motivation',info:'knowledge',secret:'reveal'},
- third:{nature:'thirdNature',role:'thirdRole',objectif:'thirdObj',motivation:'thirdMot'}};
- if(maps[block])S[block][field]=other(maps[block][field],S[block][field]);else S[block]=other(block,S[block]);
+ const maps={
+  ant:{nature:'nature',fonction:'fonction',faction:'faction',rapport:'rapport',objectif:'objectif',motivation:'motivation',power:'power',technique:'technique',knowledge:'knowledge',particularity:'particularity'},
+  obj:{nature:'objectNature',origin:'objectOrigin',fonction:'objectFunction',link:'objectFunction',manifestation:'manifestation'},
+  char:{nature:'nature',fonction:'fonction',position:'thirdRole',objectif:'objectif',motivation:'motivation',info:'knowledge',secret:'reveal'},
+  third:{nature:'thirdNature',role:'thirdRole',objectif:'thirdObj',motivation:'thirdMot'},
+  loc:{nature:'location',fonction:'locationFunction',feature:'locationFeature'},
+  res:{type:'resType',objective:'resObj',stakes:'stakes'},
+  event:{type:'eventType',text:'event'},
+  mission:{value:'mission'},situation:{value:'situation'},friction:{value:'friction'},reveal:{value:'reveal'}
+ };
+ if(maps[block]&&maps[block][field]){
+   const key=maps[block][field];
+   if(block==='mission'||block==='situation'||block==='friction'||block==='reveal') S[block]=other(key,S[block]);
+   else S[block][field]=other(key,S[block][field]);
+ }
  render()
 }
 function rerollBlock(id){
