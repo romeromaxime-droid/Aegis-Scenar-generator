@@ -3,81 +3,382 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>A.E.G.I.S. — Générateur de micro-scénarios</title>
+<title>A.E.G.I.S. — Générateur V5 — Personnages</title>
 <style>
-:root{--bg:#111315;--panel:#1a1d20;--line:#343a40;--text:#eee9df;--muted:#aaa79f;--accent:#c6a46b}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#292d30,#111315 60%);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
-header{padding:26px 20px;border-bottom:1px solid var(--line);background:#0b0d0e}header strong{font:700 38px Georgia,serif;letter-spacing:.12em}header small{display:block;color:var(--accent);letter-spacing:.16em;margin-top:3px}
-main{max-width:1000px;margin:25px auto;padding:0 16px}.panel{background:#1a1d20;border:1px solid var(--line);border-radius:12px;padding:22px;margin-bottom:20px;box-shadow:0 15px 40px #0005}
-h1,h2{font-family:Georgia,serif;font-weight:500}h1{margin-top:0}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-label{color:var(--muted);font-size:13px}select{display:block;width:100%;margin-top:6px;padding:11px;background:#101214;color:var(--text);border:1px solid var(--line);border-radius:7px;font:inherit}
-button{border-radius:7px;padding:10px 14px;font:inherit;cursor:pointer}.primary{margin-top:18px;background:var(--accent);border:1px solid var(--accent);font-weight:700}.secondary,.reroll{background:transparent;color:var(--accent);border:1px solid var(--accent)}
-.head{display:flex;justify-content:space-between;gap:12px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:15px}.eyebrow{font-size:11px;letter-spacing:.16em;color:var(--accent)}
-.row{display:grid;grid-template-columns:220px 1fr auto;gap:15px;padding:14px 0;border-bottom:1px solid #2b2f32}.name{font-weight:650}.value{color:#ddd8cf}.reroll{padding:4px 9px;font-size:18px}.optional{opacity:.95}.pitch{margin-top:20px;padding:18px;border-left:3px solid var(--accent);background:#111416}.hidden{display:none}
-@media(max-width:700px){header strong{font-size:30px}.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr auto}.value{grid-column:1/-1}.head{align-items:flex-start}}
+:root{--bg:#faf9f6;--panel:#fff;--line:#4a4a4a;--line-soft:#c8c5bf;--text:#171717;--muted:#3f3f3f;--accent:#8a6426;--accent-dark:#5f4318;--red:#8b1e1e;--red-bg:#fff4f4}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{padding:18px 16px 20px;border-bottom:2px solid #171717;background:#fff}
+main{max-width:1050px;margin:24px auto;padding:0 16px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px;margin-bottom:20px;box-shadow:0 5px 18px rgba(0,0,0,.08)}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;font-weight:600;color:#111}
+h1{font-size:28px;margin-top:0}h2{font-size:23px}h3{font-size:19px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+label{color:#292929;font-size:14px;font-weight:600}
+select{display:block;width:100%;margin-top:6px;padding:12px;background:#fff;color:#111;border:2px solid #3d3d3d;border-radius:7px;font:inherit;min-height:46px}
+button{border-radius:7px;padding:9px 13px;font:inherit;cursor:pointer}
+.primary{margin-top:18px;background:var(--accent-dark);color:#fff;border:2px solid #3d2a0e;font-weight:800;padding:12px 18px}
+.secondary,.reroll,.block{background:#fff;color:#5a3d12;border:2px solid #6d4d1b}
+.head,.sectionHead{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.head{border-bottom:1px solid var(--line);padding-bottom:15px}
+.eyebrow{font-size:11px;letter-spacing:.16em;color:#5a3d12;font-weight:800}
+.meta,.hint{color:var(--muted);font-size:13px}
+.section{padding:20px 0;border-bottom:1px solid var(--line-soft)}.section:last-child{border:0}
+.row{display:grid;grid-template-columns:220px 1fr auto;gap:14px;padding:11px 0;border-bottom:1px solid #d8d5cf}.row:last-child{border:0}
+.name{font-weight:750;color:#171717}.value{color:#242424}.reroll{padding:3px 8px;font-size:17px}
+.optional,.optional .name,.optional .value{color:var(--red)}.optional{background:var(--red-bg);border-left:4px solid var(--red);padding-left:10px}
+.optional button{color:var(--red);border-color:var(--red)}
+.tag{font-size:10px;letter-spacing:.1em;border:2px solid currentColor;border-radius:4px;padding:2px 5px;margin-left:6px;font-weight:800}
+.story{margin-top:22px;padding:20px;border-left:4px solid var(--accent-dark);background:#fff;border-top:1px solid var(--line-soft);border-right:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft)}
+.story h3{margin:0 0 5px}.story p{margin:0 0 15px;color:#202020}
+.hidden{display:none}.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.smallbtn{width:auto;margin:0;padding:9px 12px}
+.brand{text-align:center;border-bottom:2px solid #8a6426;padding:4px 0 18px;margin-bottom:16px}
+.brand-logo{display:block;width:min(430px,100%);max-height:300px;object-fit:contain;margin:0 auto 8px;border-radius:8px}
+.brand-title{font-family:Georgia,"Times New Roman",serif;letter-spacing:.18em;font-size:28px;color:#171717;font-weight:700}
+.brand-subtitle{font-family:Georgia,"Times New Roman",serif;letter-spacing:.08em;font-size:13px;color:#5f4318;font-weight:700}
+.brand-dept{font-size:11px;letter-spacing:.08em;color:#333;margin-top:9px;font-weight:650}
+@media(max-width:700px){header{padding:12px 10px 16px}.brand-logo{max-height:250px}.brand-title{font-size:25px}.grid{grid-template-columns:1fr}.head,.sectionHead{align-items:flex-start;flex-direction:column}.row{grid-template-columns:1fr auto}.value{grid-column:1/-1}.primary{width:100%;font-size:17px}}
 </style>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#faf9f6">
 </head>
 <body>
-<header><strong>A.E.G.I.S.</strong><small>GÉNÉRATEUR DE MICRO-SCÉNARIOS</small></header>
+<header><div class="brand">
+<img class="brand-logo" src="aegis-logo.jpg" alt="Emblème A.E.G.I.S.">
+<div class="brand-title">A.E.G.I.S.</div>
+<div class="brand-subtitle">GÉNÉRATEUR DE SCÉNARIOS — V5</div>
+<div class="brand-dept">AGENCE EUROPÉENNE DE GARDE ET D’INTERVENTION SURNATURELLE</div>
+</div></header>
+
 <main>
 <section class="panel">
 <h1>Paramètres de mission</h1>
 <div class="grid">
-<label>Nombre d'agents<select id="agents"><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
-<label>Durée<select id="duration"><option value="2">2 h</option><option value="3">3 h</option><option value="4">4 h</option><option value="5">5 h</option></select></label>
-<label>Genre / tonalité<select id="genre"></select></label>
+<label>Nombre de joueurs
+<select id="agents"><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+</label>
+<label>Durée
+<select id="duration"><option value="2">2 h</option><option value="3">3 h</option><option value="4">4 h</option><option value="5">5 h</option></select>
+</label>
+<label>Genre / tonalité
+<select id="genre">
+<option>Pulp / Action</option><option>Horreur</option><option>Enquête</option>
+<option>Exploration / Découverte / Lore</option><option>Social / Éthique / Dilemme</option>
+<option>Poétique / Étrange</option><option>Survie</option><option>Thriller / Course contre la montre</option>
+</select>
+</label>
+<label style="grid-column:1/-1">Personnages joueurs
+<div id="playerSelectors" class="grid" style="margin-top:8px"></div>
+</label>
 </div>
-<button class="primary" id="generate">Générer le scénario</button>
+<button type="button" class="primary" id="generate">Générer le scénario</button>
+<p class="hint">Chaque joueur choisit un personnage différent. Les descriptions visuelles sont automatiquement intégrées au prompt final.</p>
 </section>
+
 <section class="panel hidden" id="result">
-<div class="head"><div><span class="eyebrow">BILLET DE SCÉNARIO</span><h2 id="title">Mission A.E.G.I.S.</h2></div><button class="secondary" id="copy">Copier</button></div>
-<div id="rows"></div><div class="pitch" id="pitch"></div>
+<div class="head"><div>
+<span class="eyebrow">BILLET DE SCÉNARIO</span>
+<h2 id="title">Mission A.E.G.I.S.</h2>
+<div class="meta" id="meta"></div>
+<div class="meta" id="playerMeta"></div>
+</div>
+<div class="actions">
+<button class="secondary" id="copy">Copier le billet</button>
+<button class="primary smallbtn" id="copyPrompt">Copier billet + prompt</button>
+</div></div>
+<div id="rows"></div><div class="story" id="story"></div>
 </section>
 </main>
+
 <script>
-const D={
-genres:["Pulp / Action","Horreur","Enquête","Exploration / Découverte / Lore","Social / Éthique / Dilemme","Poétique / Étrange","Survie","Thriller / Course contre la montre"],
-mission:[
-"Enquêter sur une manifestation surnaturelle inhabituelle…","Enquêter sur la disparition inexpliquée de plusieurs personnes…","Intervenir face à un phénomène surnaturel actuellement en cours…","Intervenir pour empêcher une menace surnaturelle de se propager…","Explorer un lieu surnaturel récemment découvert…","Explorer un site ancien dont l’existence vient d’être confirmée…","Explorer un territoire inconnu et en extraire un élément précis…","Récupérer un artefact ou un objet surnaturel avant qu’il ne tombe entre de mauvaises mains…","Récupérer un artefact et le transférer sous contrôle d’A.E.G.I.S.…","Extraire une personne ou une entité d’un environnement devenu dangereux…","Extraire une personne et la mettre sous protection d’A.E.G.I.S.…","Transférer une créature, un objet ou une substance surnaturelle vers un site sécurisé…","Protéger une personne ou une communauté menacée par une présence surnaturelle…","Protéger un site pendant qu’une autre équipe accomplit une opération…","Sécuriser un lieu dont le phénomène surnaturel ne peut plus être contenu…","Confiner une entité ou un phénomène devenu incontrôlable…","Négocier avec une entité ou une communauté surnaturelle…","Établir ou préserver une relation entre A.E.G.I.S. et une puissance surnaturelle…","Enquêter sur un phénomène puis récupérer ce qui en est à l’origine…","Explorer un lieu puis extraire une personne, une entité ou un élément découvert sur place…"],
-situation:["Plusieurs personnes ont disparu inexplicablement.","Une manifestation surnaturelle est signalée dans une zone habitée.","Un phénomène surnaturel se répète selon un schéma impossible.","Un objet ou artefact inconnu vient de refaire surface.","Une personne manifeste un pouvoir surnaturel incontrôlable.","Une créature surnaturelle vient d’être découverte par le monde humain.","Une communauté locale affirme être menacée par une présence surnaturelle.","Une équipe de recherche ou d’agents a disparu.","Un événement violent laisse des traces surnaturelles.","Un site ancien est découvert à la suite d’un événement inattendu.","Un phénomène connu d’A.E.G.I.S. change soudainement de comportement.","Une personne ou une entité demande directement l’aide d’A.E.G.I.S.","Une faction connue intervient dans un territoire ou un dossier sensible.","Un phénomène commence à dépasser sa zone habituelle.","Une précédente opération d’A.E.G.I.S. a laissé une situation non résolue.","Une personne normalement fiable disparaît ou change de comportement.","Des traces indiquent la reprise d’une activité surnaturelle ancienne.","Un incident apparemment ordinaire révèle une origine surnaturelle.","Deux groupes sont sur le point de s’affronter pour un élément surnaturel.","A.E.G.I.S. reçoit des informations incomplètes sur une menace ou découverte potentiellement majeure."],
-antagonist:["Un criminel isolé.","Un meurtrier rituel ou criminel occultiste.","Une personne dotée d’un pouvoir inexpliqué.","Une créature surnaturelle solitaire.","Une créature ancienne ou antédiluvienne.","Un phénomène surnaturel conscient et hostile.","Un culte ou une secte.","Une société secrète ou organisation occulte.","Un réseau criminel ou mafieux.","Des sorcières ou sorciers dissidents.","L’Assemblée des Sorcières.","Un peuple féerique ou une communauté fae.","Une meute ou communauté de garous.","Une communauté surnaturelle indépendante.","Une faction séparatiste ou de libération.","Une cellule ou un réseau clandestin de la CIA.","Mossad 17.","Ordo Veritas.","Une puissance étrangère ou son service spécialisé.","Une force ou faction inconnue."],
-objective:["Récupérer un artefact, une personne ou une créature.","Prendre le contrôle d’un pouvoir ou phénomène surnaturel.","Détruire un objet, un lieu, une personne ou un phénomène.","Protéger quelque chose que l’antagoniste considère comme essentiel.","Réveiller ou libérer une entité, créature ou force ancienne.","Empêcher quelqu’un d’autre d’obtenir un élément surnaturel.","Exploiter ou militariser un pouvoir ou phénomène surnaturel.","Comprendre un phénomène et apprendre à exploiter ses capacités.","Se venger.","Fuir une menace, une captivité ou une situation surnaturelle.","Étendre un phénomène, une influence, un territoire ou une transformation.","Cacher le phénomène et empêcher sa découverte.","Transformer une personne, une communauté, un lieu ou une créature.","Accomplir un rituel en plusieurs étapes.","Établir un contact avec une entité ou intelligence surnaturelle.","Libérer ou sauver une personne, une créature ou une communauté.","Négocier et obtenir quelque chose d’une puissance surnaturelle.","Reproduire un pouvoir, une technologie ou un phénomène.","Prendre possession d’un territoire ou lieu surnaturel.","Provoquer un événement majeur dont les conséquences dépassent l’antagoniste."],
-object:["Un artefact ancien dont la fonction reste inconnue.","Une arme ou un instrument surnaturel.","Un objet qui modifie ou transmet des souvenirs.","Une technologie antédiluvienne partiellement fonctionnelle.","Un objet contenant ou emprisonnant une entité.","Une substance surnaturelle qui évolue avec le temps.","Un phénomène psychique affectant les personnes.","Une zone où les lois physiques ou naturelles sont altérées.","Une manifestation liée aux rêves ou au sommeil.","Un phénomène de transformation physique ou biologique.","Une ancienne malédiction qui réapparaît.","Un rituel ou dispositif ouvrant un passage vers un autre lieu ou une autre dimension.","Une source d’énergie surnaturelle puissante et instable.","Une entité ou conscience liée à un objet, un lieu ou un réseau.","Un phénomène temporel.","Un lieu possédant une propriété surnaturelle.","Un organisme ou une forme de vie inconnue.","Un fragment d’une ancienne civilisation donnant accès à un savoir oublié.","Un phénomène qui se propage à travers l’environnement ou les êtres vivants.","Un élément surnaturel dont la nature et la fonction ne peuvent être comprises immédiatement."],
-location:["Un lieu public ou urbain ordinaire où le phénomène doit rester discret.","Une propriété privée ou une demeure isolée.","Un bâtiment abandonné ou désaffecté.","Un laboratoire clandestin consacré à l’étude ou à l’exploitation du surnaturel.","Une installation militaire ou de renseignement dissimulant une activité surnaturelle.","Une infrastructure industrielle ou énergétique présentant une activité inhabituelle.","Un musée, une collection privée ou un dépôt contenant un élément surnaturel.","Un site religieux, sanctuaire ou lieu de culte ancien.","Un lieu sacré appartenant à une communauté de sorcières ou de praticiens de la magie.","Une forêt, jungle ou région naturelle abritant une présence surnaturelle.","Une caverne ou un réseau souterrain dont la géographie présente des propriétés inhabituelles.","Un site archéologique récemment découvert.","Un site antédiluvien contenant les vestiges d’une ancienne civilisation.","Une installation ou un laboratoire oublié lié aux anciennes sciences ou technologies.","Un territoire féerique ou le domaine d’un peuple surnaturel.","Un territoire surnaturel revendiqué par une communauté ou une faction.","Une poche extradimensionnelle accessible depuis le monde humain.","Une dimension ou un monde entièrement extérieur à la réalité terrestre connue.","Un lieu où la frontière entre plusieurs réalités est instable.","Un lieu impossible dont l’espace, le temps ou les lois physiques ne fonctionnent pas normalement."],
-character:["Un témoin civil.","Une victime ou une personne ayant survécu à l’événement.","Une personne dotée involontairement d’un pouvoir surnaturel.","Un scientifique ou chercheur.","Un archéologue ou historien.","Un praticien de la magie.","Un membre d’une communauté surnaturelle locale.","Un membre de la faction adverse prêt à parler.","Un ancien membre ou dissident d’une faction adverse.","Un criminel impliqué pour ses propres raisons.","Un agent d’une autre organisation.","Un agent d’A.E.G.I.S. isolé ou porté disparu.","Une personne à protéger ou à extraire.","Une personne détenant l’élément recherché.","Un gardien ou protecteur qui bloque l’accès.","Une créature surnaturelle capable de communiquer.","Une entité ancienne connaissant une partie de la vérité.","Un allié potentiel aux motivations incertaines.","Une victime apparente qui cache son implication.","Un personnage dont l’identité, la nature ou les intentions restent incertaines."],
-power:["Télépathie.","Empathie ou manipulation émotionnelle.","Possession ou contrôle.","Métamorphose.","Régénération ou résistance surnaturelle.","Manipulation ou absorption d’énergie.","Manipulation de la mémoire ou de l’identité.","Pouvoir lié aux rêves et au sommeil.","Manipulation de l’espace ou ouverture de passages.","Manipulation du temps.","Transformation de la matière.","Invocation ou contrôle de créatures.","Contamination ou propagation d’une transformation.","Absorption, vol ou transmission de pouvoirs.","Projection ou déplacement de la conscience.","Manipulation des perceptions ou des sens.","Influence surnaturelle sur la nature ou l’environnement.","Barrière ou protection surnaturelle.","Ancienne magie ou technologie surnaturelle.","Un pouvoir totalement inédit."],
-friction:["Des civils empêchent une intervention ouverte.","Les autorités locales ignorent la situation.","Les autorités locales sont hostiles ou refusent de coopérer.","Les agents doivent rester sous couverture.","Les communications avec le QG sont difficiles ou impossibles.","Le phénomène perturbe les technologies et instruments.","Le lieu est difficile ou dangereux à atteindre.","Les ressources ou équipements disponibles sont limités.","Une autre organisation intervient simultanément.","L’antagoniste sait que les agents arrivent et se prépare.","Le phénomène évolue pendant l’opération.","Une contrainte de temps s’impose.","Les agents doivent protéger une cible tout en poursuivant leur mission.","Une partie du site est inaccessible ou dangereuse.","Les informations disponibles sont incomplètes, contradictoires ou trompeuses.","Les agents doivent respecter les règles d’un territoire ou d’une communauté étrangère.","L’élément surnaturel rend difficile la distinction entre alliés, ennemis et victimes.","Une catastrophe naturelle ou un événement extérieur perturbe l’opération.","Une seconde menace apparaît.","La situation devient incontrôlable et impose de changer de plan."],
-reveal:["L’antagoniste n’est pas celui que les agents pensaient ; quelqu’un d’autre tire les ficelles.","La personne que les agents venaient sauver a provoqué le phénomène.","L’antagoniste tente en réalité d’empêcher une menace plus grave.","L’élément surnaturel est vivant ou conscient et poursuit son propre objectif.","Le phénomène n’est pas local : il existe déjà ailleurs.","La mission actuelle fait partie d’un plan plus vaste.","Une faction inconnue manipule à la fois l’antagoniste et les agents.","L’élément surnaturel a été placé volontairement sur les lieux.","L’événement actuel est directement lié à une ancienne intervention d’A.E.G.I.S.","Le lieu dissimule une seconde menace beaucoup plus importante.","L’antagoniste possède déjà ce qu’il lui faut et recherche seulement le dernier élément.","L’élément recherché est en réalité une personne, une conscience ou une entité.","Le phénomène transforme progressivement les personnes exposées.","Le véritable enjeu est de savoir qui contrôlera le phénomène après l’opération.","Détruire ou contenir le phénomène provoquera une catastrophe ailleurs.","L’antagoniste n’est qu’un intermédiaire utilisé par une puissance surnaturelle supérieure.","La victime apparente participe volontairement à la situation.","Deux factions opposées poursuivent en réalité le même objectif.","Le phénomène est le retour d’un événement ou d’une entité supposément disparu.","Les agents découvrent que leur véritable mission est différente de celle qui leur a été assignée."],
-resolution:["Récupérer et sécuriser l’élément surnaturel.","Détruire l’élément surnaturel.","Confiner la créature ou le phénomène.","Empêcher l’objectif de l’antagoniste.","Extraire la personne ou l’entité concernée.","Protéger une personne, une communauté ou un lieu jusqu’à la fin de la crise.","Empêcher la propagation du phénomène.","Fermer ou stabiliser une brèche ou un passage.","Désactiver une technologie ou un dispositif surnaturel.","Convaincre l’entité ou la faction de renoncer.","Négocier un accord.","Choisir entre plusieurs solutions insatisfaisantes.","Décider du destin d’une créature, d’un phénomène ou d’un objet au-delà du protocole standard.","Laisser la menace ou l’entité partir parce que le confinement serait pire.","Empêcher une catastrophe imminente avant l’échéance.","Sauver des personnes en abandonnant l’objectif initial.","Achever la récupération ou le transfert malgré les autres factions.","Établir la vérité avant de décider du sort de l’élément surnaturel.","Choisir entre le secret d’A.E.G.I.S. et la protection des populations.","Mettre fin à la situation sans connaître les conséquences à long terme."],
-third:["Une seconde équipe d’A.E.G.I.S. avec un objectif différent.","Une autre agence ou organisation humaine veut le même élément.","Une faction surnaturelle rivale.","Un ancien allié de l’antagoniste se retourne contre lui.","Un concurrent veut atteindre l’artefact ou le phénomène avant les agents.","Un individu puissant et indépendant.","Une créature indépendante attaque les deux camps.","Un adversaire secondaire protège l’objectif de l’antagoniste sans appartenir à sa faction.","Un ou plusieurs mercenaires.","Un prisonnier libéré devient imprévisible.","Un témoin ou civil décide d’agir.","Un scientifique veut obtenir les données ou le phénomène.","Une communauté locale défend son territoire et ses intérêts.","Une puissance surnaturelle propose son aide en échange d’un prix.","Un groupe tente de détruire ce que les agents doivent récupérer ou protéger.","Un individu lié au phénomène apparaît et semble pouvoir le contrôler.","Une faction inconnue surveillait déjà l’opération.","Un ancien adversaire d’A.E.G.I.S. intervient contre l’antagoniste.","Un allié potentiel poursuit son propre agenda et peut devenir adversaire.","Une troisième force indépendante est incompatible avec les deux camps."],
-event:["Le phénomène change brutalement de comportement.","La victime disparaît.","L’antagoniste agit plus tôt que prévu.","Le site s’effondre ou devient inaccessible.","Une nouvelle information impose de changer de plan.","Un objectif secondaire devient urgent.","Les agents sont séparés.","Le phénomène commence à se propager.","Une personne jusque-là passive agit de manière inattendue.","Une faction locale intervient.","L’élément essentiel est déplacé ou volé.","Le pouvoir se manifeste avec une intensité imprévue.","Une nouvelle victime apparaît.","Une sortie ou les communications sont coupées.","L’antagoniste propose un marché.","Un allié révèle ses propres intérêts.","Un événement extérieur perturbe l’opération.","Une seconde manifestation surnaturelle apparaît.","Une nouvelle zone est découverte.","Un événement irréversible commence."],
-jurisdiction:["Juridiction directe d’A.E.G.I.S.","État allié coopérant","État étranger avec autorisation officielle","État étranger avec autorisation limitée","Territoire neutre","Intervention non déclarée","Territoire hostile à A.E.G.I.S.","Territoire disputé / juridiction incertaine","Territoire relevant d’une puissance ou communauté surnaturelle","Hors de toute juridiction connue"]
+const CHARACTERS={
+Elliot:{fullName:"Elliot Kramer",visual:"Homme de moins de 30 ans, cheveux bruns mi-longs légèrement désordonnés, allure jeune, séduisante et queer, silhouette légèrement athlétique. Style chic et sombre inspiré de John Constantine : costume ou veste élégante, chemise et détails raffinés. Lunettes et marteau surnaturel caractéristiques, sans devoir être au centre de la composition."},
+Martin:{fullName:"Martin Vanacker",visual:"Homme de 35 ans, mature sans paraître âgé, blond, yeux verts, barbe courte, carrure solide et physique d'aventurier. Style A.E.G.I.S. de terrain, robuste et fonctionnel. Présence adulte et expérimentée, nettement plus mature qu'Elliot."},
+Juliette:{fullName:"Juliette Saint-Rose-Guiraud",visual:"Femme métisse à la peau noire, seule personnage joueur à avoir cette carnation. Cheveux noirs bouclés, visage expressif, regard assuré, silhouette athlétique et élégante. Tenue A.E.G.I.S. sombre et sophistiquée. Sa nature surnaturelle peut se manifester par une longue forme serpentine couverte d'écailles sombres lorsque le scénario le justifie."},
+Miklos:{fullName:"Miklós Varga",visual:"Homme au visage légèrement émacié, cheveux sombres, traits marqués et petites cicatrices. Seul scientifique de l'équipe. Esthétique rétro inspirée des années 1950-1960, même avec des vêtements contemporains. Style scientifique vintage, jamais occultiste. Lunettes non obligatoires. Électricité et magnétisme comme marqueurs surnaturels."},
+Eleonore:{fullName:"Éléonore Vautrin",visual:"Femme brune à coupe garçonne, regard vif et légèrement espiègle. Voleuse élégante. Style fashion, chic, ajusté et parfois sensuel, jamais vulgaire. Son charme vient de l'élégance, de la posture, des coupes et matières. Pouvoirs liés aux ombres."},
+Lejak:{fullName:"Lejak",visual:"Humanoïde amphibien massif à tête clairement inspirée d'un crapaud, peau texturée, yeux de crapaud, gueule et proportions amphibiennes. Jamais tortue, jamais saurien. Corps puissant et lourd. Équipement A.E.G.I.S. tactique sombre adapté à sa morphologie. Peut porter une arme lourde ou une hache."}
 };
-const fields=[
-["mission","Nature de la mission","mission"],["situation","Situation de départ","situation"],["antagonist","Antagoniste / force opposée","antagonist"],["objective","Objectif de l’antagoniste","objective"],["object","Artefact / phénomène / objet","object"],["location","Lieu","location"],["character","Personnage clé","character"],["power","Pouvoir / particularité surnaturelle","power"],["friction","Friction / contrainte opérationnelle","friction"],["reveal","Révélation","reveal"],["resolution","Résolution / enjeu final","resolution"],["third","Intervenant tiers","third"],["event","Événement intermédiaire","event"],["jurisdiction","Juridiction","jurisdiction"]];
-const optional=new Set(["third","event"]);let state={};
-const $=id=>document.getElementById(id);
-D.genres.forEach(x=>{let o=document.createElement("option");o.textContent=x;$("genre").appendChild(o)});
+
+const ART=`DIRECTION ARTISTIQUE FIXE — A.E.G.I.S.
+Couverture pulp de jeu de rôle, illustration franco-belge contemporaine et fantasy surnaturelle sombre. Réalisme stylisé, jamais manga, anime, cartoon ou photoréaliste. Images volontairement neutralisées et lisibles, fort clair-obscur, grandes masses d'ombre, lumière directionnelle, palette noire, bleu nuit, gris pierre, bronze/or vieilli, quelques accents rouges ou orangés.
+Composition de couverture avec agents lisibles lorsque pertinent, décor narratif derrière, quelques cadres/panneaux propres et limités représentant d'autres lieux, scènes, objets ou antagonistes du scénario. Aucun excès de détails.
+Titre du scénario en bas dans une typographie pulp. Logo A.E.G.I.S. en haut, toujours. Aucune autre écriture.
+Les spoilers de fin sont omis, partiellement cadrés ou rendus non reconnaissables. Les personnages sélectionnés conservent exactement leurs marqueurs visuels.`;
+
+const D={
+mission:["Enquêter sur une manifestation surnaturelle inhabituelle.","Enquêter sur la disparition inexpliquée de plusieurs personnes.","Intervenir face à un phénomène surnaturel en cours.","Empêcher une menace surnaturelle de se propager.","Explorer un lieu surnaturel récemment découvert.","Explorer un site ancien dont l’existence vient d’être confirmée.","Récupérer un artefact surnaturel avant qu’il ne tombe entre de mauvaises mains.","Extraire une personne ou une entité d’un environnement dangereux.","Protéger une personne ou une communauté menacée.","Confiner une entité ou un phénomène devenu incontrôlable.","Négocier avec une entité ou une communauté surnaturelle.","Préserver une relation entre A.E.G.I.S. et une puissance surnaturelle.","Identifier et neutraliser une menace avant qu’elle n’atteigne une population.","Empêcher deux factions surnaturelles de déclencher un conflit ouvert."],
+situation:["Plusieurs personnes ont disparu inexplicablement.","Une manifestation surnaturelle est signalée dans une zone habitée.","Un phénomène surnaturel se répète selon un schéma impossible.","Un objet ou artefact inconnu vient de refaire surface.","Une personne manifeste un pouvoir surnaturel incontrôlable.","Une créature surnaturelle vient d’être découverte par le monde humain.","Une communauté locale affirme être menacée.","Une équipe de recherche ou d’agents a disparu.","Un événement violent laisse des traces surnaturelles.","Un site ancien est découvert après un événement inattendu.","Un phénomène connu d’A.E.G.I.S. change soudainement de comportement.","Une personne ou une entité demande directement l’aide d’A.E.G.I.S.","Une faction connue intervient dans un territoire sensible.","Des traces indiquent la reprise d’une activité surnaturelle ancienne."],
+nature:["Humain","Humain altéré par le surnaturel","Humain altéré biologiquement","Humain altéré technologiquement","Garou / métamorphe","Créature surnaturelle","Créature féerique","Esprit","Fantôme","Revenant","Mort-vivant","Démon / entité infernale","Djinn / génie","Entité extradimensionnelle","Phénomène conscient","Intelligence non humaine","Descendant d’une civilisation antédiluvienne","Descendant d’Atlantide / Lemurie / Mu","Hybride humain / surnaturel","Être artificiel ou créé","Entité liée à un artefact","Entité collective"],
+fonction:["Scientifique","Chercheur","Occultiste / praticien","Médecin","Militaire","Agent de renseignement","Industriel","Diplomate","Religieux","Criminel","Mercenaire","Explorateur","Érudit","Archéologue","Artiste","Agent d’une organisation","Chef de communauté","Gardien","Militant","Héritier d’un savoir ancien","Survivant","Indépendant poursuivant ses propres intérêts"],
+faction:["Agit seul, sans faction identifiable","Une communauté surnaturelle locale","Une faction féerique","Une société secrète","Un culte ou groupe religieux","Une organisation criminelle","Une entreprise ou consortium privé","Une puissance étatique","Un service de renseignement","Une organisation scientifique","Ordo Veritas","Une faction dissidente d’une ancienne civilisation","Une puissance extradimensionnelle","Une faction antédiluvienne","Une communauté locale défendant son territoire","Une faction inconnue"],
+rapport:["En est le chef ou la dirige directement.","En est un membre actif.","En est le représentant officiel.","Agit pour défendre ses intérêts.","Protège ses intérêts mais poursuit son propre objectif.","Lui doit quelque chose.","Est manipulé ou contraint par elle.","Utilise la faction comme moyen d’action.","Est en conflit avec sa propre faction.","A rompu avec elle mais conserve des liens.","La faction le protège ou le recherche.","La faction ignore ses véritables intentions.","N’a aucun lien réel avec elle malgré les apparences."],
+objectif:["Récupérer un artefact, une personne ou une créature.","Prendre le contrôle d’un pouvoir ou phénomène surnaturel.","Détruire un objet, un lieu, une personne ou un phénomène.","Protéger quelque chose qu’il considère comme essentiel.","Réveiller ou libérer une entité, créature ou force ancienne.","Empêcher quelqu’un d’autre d’obtenir un élément surnaturel.","Exploiter ou militariser un pouvoir ou phénomène.","Comprendre un phénomène et apprendre à exploiter ses capacités.","Se venger d’une personne, d’un groupe ou d’une faction.","Fuir une menace ou une captivité surnaturelle.","Étendre un phénomène, une influence, un territoire ou une transformation.","Cacher le phénomène et empêcher sa découverte.","Transformer une personne, une communauté, un lieu ou une créature.","Accomplir un rituel en plusieurs étapes.","Établir un contact avec une entité ou intelligence surnaturelle.","Libérer ou sauver une personne, une créature ou une communauté.","Négocier et obtenir quelque chose d’une puissance surnaturelle."],
+motivation:["Obtenir un gain matériel.","Accroître son pouvoir ou son influence.","Survivre à une menace.","Sauver ou protéger un proche.","Soigner une maladie ou une blessure.","Protéger sa communauté.","Rester fidèle à une personne ou à une faction.","Défendre une cause ou une idéologie.","Accomplir un devoir ou une mission.","Se venger d’une injustice passée.","Libérer une personne ou une communauté opprimée.","Acquérir un savoir interdit.","Assouvir une obsession.","Réparer une faute ancienne.","Honorer une dette ou respecter un marché.","Être manipulé ou contraint.","Obtenir une contrepartie : protection, information ou traitement."],
+power:["Force surnaturelle exceptionnelle.","Agilité ou vitesse surnaturelle.","Résistance et endurance surnaturelles.","Régénération.","Sens surnaturels développés.","Télépathie.","Manipulation émotionnelle.","Possession ou contrôle d’un autre être.","Métamorphose.","Manipulation d’énergie.","Manipulation de la mémoire.","Manipulation de l’espace.","Transformation de la matière.","Invocation ou contrôle de créatures.","Contamination ou propagation d’une transformation.","Manipulation des perceptions.","Barrière ou protection surnaturelle.","Pouvoir provenant d’un artefact.","Pouvoir technologique ou Teslien / Teslienne.","Métamorphose animale ou hybride."],
+technique:["Combat rapproché brutal et direct.","Combat défensif et contre-attaque.","Embuscade et attaque depuis un terrain favorable.","Immobilisation ou entrave.","Désarmement et neutralisation rapide.","Utilisation tactique de l’environnement.","Attaque à distance.","Protection d’un allié ou d’un objectif.","Fuite et déplacement rapide.","Séparation des agents.","Manipulation psychologique.","Combinaison coordonnée d’un pouvoir et d’un objet."],
+knowledge:["Connaît les propriétés essentielles du phénomène.","Connaît l’histoire du lieu.","Connaît un ancien rituel permettant d’agir sur l’élément.","Connaît l’existence d’une faction impliquée.","Connaît une faiblesse ou une limitation de l’élément.","Connaît l’origine véritable d’un pouvoir.","Connaît un passage ou accès secret du lieu.","Connaît une ancienne opération d’A.E.G.I.S. liée au dossier.","Ne possède qu’une information partielle mais déterminante."],
+particularity:["Ne possède pas de reflet.","Sa présence provoque le même rêve chez plusieurs personnes.","Existe simultanément sur plusieurs plans de réalité.","Ne peut être perçu correctement que par certaines personnes.","Laisse une trace surnaturelle persistante.","Sa présence perturbe les instruments d’A.E.G.I.S.","Son identité change selon la personne qui le regarde.","Ne peut franchir certaines limites symboliques.","Est lié à un lieu qu’il ne peut quitter longtemps.","Possède plusieurs mémoires contradictoires.","Son existence dépend partiellement d’un artefact ou d’un phénomène."],
+objectNature:["Un artefact magique ancien.","Une arme ou un instrument surnaturel.","Un objet lié à une conscience.","Une technologie antédiluvienne.","Une technologie Teslienne / Teslienne.","Un objet d’origine atlante, lemurienne ou mu.","Un dispositif extradimensionnel.","Une substance surnaturelle.","Un phénomène psychique.","Une zone où les lois physiques sont altérées.","Une ancienne malédiction.","Un rituel ouvrant un passage.","Une source d’énergie surnaturelle.","Une entité liée à un objet, un lieu ou un réseau.","Un phénomène temporel."],
+objectOrigin:["Humain ancien.","Humain contemporain.","Féérique.","Surnaturel.","Magique.","Antédiluvien.","Atlante.","Lemurien.","Mu.","Teslien / Teslienne.","Extradimensionnel.","Biologique.","Technologique.","Créé par une entité surnaturelle.","Créé par une civilisation disparue.","Origine inconnue."],
+objectFunction:["Conserver ou transmettre une mémoire.","Contenir une entité.","Ouvrir ou stabiliser un passage.","Amplifier un pouvoir.","Transformer une matière ou un être.","Protéger un lieu ou une personne.","Permettre la communication avec une autre réalité.","Produire ou stocker une énergie.","Modifier les perceptions.","Influencer les rêves.","Servir de clé ou de sceau.","Permettre un rituel.","Enregistrer des informations.","Contrôler une créature ou une force.","Détruire ou neutraliser un phénomène.","Fonction encore inconnue."],
+manifestation:["Provoque des effets visibles à proximité.","Modifie progressivement les personnes exposées.","Perturbe les appareils électroniques.","Produit des visions ou souvenirs étrangers.","Déforme localement l’espace.","Déclenche des phénomènes physiques inhabituels.","Attire ou repousse certaines créatures.","Se manifeste surtout pendant le sommeil.","Réagit à la présence de certaines personnes.","Devient plus actif à certaines heures.","Produit des manifestations de plus en plus fortes.","Réagit aux actions des agents."],
+location:["Un lieu public ou urbain ordinaire.","Une propriété privée ou une demeure isolée.","Un bâtiment abandonné.","Un laboratoire clandestin.","Une installation militaire ou de renseignement.","Une infrastructure industrielle ou énergétique.","Un musée ou une collection privée.","Un site religieux ou sanctuaire ancien.","Une forêt ou région naturelle.","Une caverne ou un réseau souterrain.","Un site archéologique.","Un site antédiluvien.","Une installation oubliée liée aux anciennes sciences.","Un territoire féerique.","Un territoire surnaturel revendiqué.","Une poche extradimensionnelle.","Une dimension extérieure à la réalité terrestre.","Un lieu où la frontière entre plusieurs réalités est instable."],
+locationFunction:["Le lieu sert de refuge.","Le lieu contient l’élément recherché.","Le lieu est le territoire de l’antagoniste.","Le lieu protège un ancien secret.","Le lieu impose des règles particulières.","Le lieu est instable.","Le lieu sert de point de passage.","Le lieu est utilisé pour un rituel.","Le lieu appartient à une faction surnaturelle.","Le lieu conserve les traces d’un événement ancien."],
+locationFeature:["Le lieu protège un secret ancien.","Le lieu impose des règles aux êtres surnaturels.","Les appareils A.E.G.I.S. y fonctionnent mal.","Le lieu change subtilement selon les visiteurs.","Certaines zones sont impossibles à atteindre normalement.","Le lieu réagit à la présence d’un personnage.","Des traces d’une ancienne civilisation sont visibles.","Le terrain peut être utilisé tactiquement.","Le lieu semble avoir une forme de conscience."],
+friction:["Une autorité locale complique l’accès au site.","Les communications sont perturbées.","Un témoin refuse de parler.","Les agents sont suivis.","L’accès au lieu est temporairement fermé.","Un civil se trouve au mauvais endroit.","Une autre équipe intervient.","L’antagoniste déplace l’élément recherché.","La discrétion impose de limiter les dégâts.","Un transport devient momentanément indisponible."],
+reveal:["La personne que les agents devaient sauver est liée à l’origine du phénomène.","L’antagoniste ne cherche pas réellement à détruire l’élément.","Le phénomène protège quelque chose plutôt qu’il ne le menace.","Le personnage clé connaît une partie de la vérité mais l’a cachée.","L’intervention d’A.E.G.I.S. risque de modifier durablement l’équilibre local.","L’élément surnaturel a une volonté propre."],
+resType:["Neutralisation","Protection","Récupération","Extraction","Confinement","Destruction","Négociation","Libération","Fermeture d’un passage","Choix entre plusieurs solutions","Prévention d’une catastrophe","Décision sur le destin d’une créature ou d’un objet"],
+resObj:["Neutraliser la menace.","Protéger la personne ou la communauté.","Récupérer l’élément avant l’adversaire.","Extraire une personne ou une entité.","Conserver le phénomène sous contrôle.","Détruire l’élément.","Négocier un accord.","Libérer la créature ou l’entité.","Fermer le passage.","Empêcher une catastrophe imminente.","Sauver des personnes en abandonnant l’objectif initial.","Établir la vérité avant de décider du sort de l’élément."],
+stakes:["Des vies humaines.","La survie d’une communauté.","La liberté d’une créature ou d’un peuple surnaturel.","Le secret d’A.E.G.I.S.","L’équilibre entre deux territoires surnaturels.","Un artefact impossible à remplacer.","L’accès à une autre dimension.","La stabilité d’un phénomène dangereux.","La possibilité d’éviter un conflit entre factions.","La mémoire ou l’identité de personnes exposées."],
+thirdNature:["Une personne.","Une créature surnaturelle.","Une petite faction.","Une organisation humaine.","Une faction surnaturelle.","Un groupe de mercenaires.","Une entité indépendante.","Une communauté locale."],
+thirdRole:["Une seconde équipe poursuit un objectif différent.","Une autre organisation veut le même élément.","Une faction rivale défend son territoire.","Un ancien allié de l’antagoniste se retourne contre lui.","Un concurrent veut atteindre l’artefact avant les agents.","Une créature indépendante attaque les deux camps.","Un adversaire secondaire protège l’objectif de l’antagoniste.","Un scientifique veut obtenir les données.","Une communauté locale défend ses intérêts.","Une puissance surnaturelle propose son aide en échange d’un prix."],
+thirdObj:["Obtenir l’artefact.","Empêcher l’antagoniste de réussir.","Empêcher A.E.G.I.S. de repartir avec l’élément.","Protéger son territoire.","Libérer quelqu’un.","Détruire le phénomène.","Négocier un avantage.","Obtenir des informations."],
+thirdMot:["Survie.","Protection.","Profit.","Loyauté.","Vengeance.","Dette.","Idéologie.","Intérêt scientifique.","Libération.","Peur.","Mission ou devoir."],
+eventType:["Coup de pouce","Complication","Ambiance","Surprise légère","Petit affrontement","Objet ou découverte secondaire"],
+event:["Un témoin inattendu donne une information utile puis disparaît.","Une porte ou un accès se referme momentanément.","Un petit groupe d’antagonistes mineurs surgit et fait perdre quelques minutes.","Un animal ou une créature locale réagit étrangement.","Un équipement cesse brièvement de fonctionner.","Un petit objet surnaturel est découvert au mauvais endroit.","Une erreur de l’antagoniste laisse momentanément une ouverture.","Un événement banal prend une tournure surnaturelle.","Les agents aperçoivent brièvement l’antagoniste sans pouvoir l’atteindre.","Un allié potentiel intervient puis repart.","Un civil intervient au mauvais moment.","Un raccourci inattendu permet de gagner du temps.","Un objet trouvé peut être utilisé plus tard sans être nécessaire à la résolution."]
+};
+
+let S={};
+
+function $(id){return document.getElementById(id)}
 function pick(k){let a=D[k];return a[Math.floor(Math.random()*a.length)]}
-function generate(){
-state={};
-fields.forEach(([id,,k])=>{if(id==="third"&&+$("duration").value<4)return;if(id==="event"&&+$("duration").value<3)return;state[id]=pick(k)});
-render();$("result").classList.remove("hidden");
+function other(k,c){let a=D[k],v=c,n=0;while(v===c&&n++<20)v=pick(k);return v}
+function esc(v){return String(v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]||c))}
+function lc(v){return String(v).charAt(0).toLowerCase()+String(v).slice(1)}
+
+function updatePlayerSelectors(){
+ const n=+$('agents').value,box=$('playerSelectors'),old=[...box.querySelectorAll('select')].map(s=>s.value);
+ box.innerHTML='';
+ for(let i=0;i<n;i++){
+  const l=document.createElement('label');l.textContent='Joueur '+(i+1);
+  const s=document.createElement('select');
+  s.innerHTML='<option value="">— Choisir un personnage —</option>'+Object.keys(CHARACTERS).map(k=>'<option value="'+k+'">'+k+'</option>').join('');
+  if(old[i]&&CHARACTERS[old[i]])s.value=old[i];
+  s.onchange=refreshPlayerOptions;l.appendChild(s);box.appendChild(l);
+ }
+ refreshPlayerOptions()
 }
-function reroll(id){let f=fields.find(x=>x[0]===id);state[id]=pick(f[2]);render()}
+function refreshPlayerOptions(){
+ const ss=[...document.querySelectorAll('#playerSelectors select')],used=ss.map(s=>s.value).filter(Boolean);
+ ss.forEach(s=>[...s.options].forEach(o=>{if(o.value)o.disabled=used.includes(o.value)&&o.value!==s.value}))
+}
+function getSelectedPlayers(){
+ const v=[...document.querySelectorAll('#playerSelectors select')].map(s=>s.value);
+ if(v.length!==+$('agents').value||v.some(x=>!x))throw new Error('Sélectionne un personnage différent pour chaque joueur.');
+ if(new Set(v).size!==v.length)throw new Error('Un personnage ne peut pas être sélectionné deux fois.');
+ return v
+}
+function characterPrompt(){
+ return getSelectedPlayers().map((k,i)=>'JOUEUR '+(i+1)+' — '+CHARACTERS[k].fullName+'\nDescription visuelle fixe : '+CHARACTERS[k].visual).join('\n\n')
+}
+function characterSummary(){return getSelectedPlayers().map((k,i)=>'Joueur '+(i+1)+' : '+CHARACTERS[k].fullName).join(' · ')}
+
+function buildBlocks(){
+ S.ant={nature:pick('nature'),fonction:pick('fonction'),faction:pick('faction'),rapport:pick('rapport'),objectif:pick('objectif'),motivation:pick('motivation'),power:pick('power'),technique:pick('technique'),knowledge:pick('knowledge'),particularity:pick('particularity')};
+ S.obj={nature:pick('objectNature'),origin:pick('objectOrigin'),fonction:pick('objectFunction'),link:pick('objectFunction'),manifestation:pick('manifestation')};
+ S.char={nature:pick('nature'),fonction:pick('fonction'),position:pick('thirdRole'),objectif:pick('objectif'),motivation:pick('motivation'),info:pick('knowledge'),secret:pick('reveal')};
+ S.third={nature:pick('thirdNature'),role:pick('thirdRole'),objectif:pick('thirdObj'),motivation:pick('thirdMot')}
+}
+function generateScenario(){
+ S={selectedPlayers:getSelectedPlayers(),mission:pick('mission'),situation:pick('situation'),friction:pick('friction'),reveal:pick('reveal'),res:{type:pick('resType'),objective:pick('resObj'),stakes:pick('stakes')},event:{type:pick('eventType'),text:pick('event')},loc:{nature:pick('location'),fonction:pick('locationFunction'),feature:pick('locationFeature')}};
+ buildBlocks();render();$('result').classList.remove('hidden')
+}
+function opt(){let d=+$('duration').value;return{event:d>=3,reveal:d>=4,third:d>=4}}
+function makeTitle(){
+ let g=$('genre').value;
+ if(g==='Horreur')return'La présence';if(g==='Enquête')return'Les traces du dossier';
+ if(g==='Exploration / Découverte / Lore')return'Les traces de l’ancien monde';
+ if(g==='Social / Éthique / Dilemme')return'Le prix du choix';
+ if(g==='Poétique / Étrange')return'Ce qui demeure de l’autre côté';
+ if(g==='Thriller / Course contre la montre')return'Avant que tout bascule';
+ return'Dossier A.E.G.I.S.'
+}
+function row(label,val,fn,opt=false){
+ let d=document.createElement('div');d.className='row'+(opt?' optional':'');
+ let n=document.createElement('div');n.className='name';n.innerHTML=esc(label)+(opt?' <span class="tag">OPTIONNEL</span>':'');
+ let v=document.createElement('div');v.className='value';v.textContent=val;
+ let b=document.createElement('button');b.className='reroll';b.textContent='↻';b.onclick=fn;d.append(n,v,b);return d
+}
+function section(title,id,rows,opt=false){
+ let s=document.createElement('div');s.className='section'+(opt?' optional':'');
+ let h=document.createElement('div');h.className='sectionHead';
+ let t=document.createElement('h3');t.innerHTML=esc(title)+(opt?' <span class="tag">OPTIONNEL</span>':'');
+ let b=document.createElement('button');b.className='block';b.textContent='↻ Reroll du bloc';b.onclick=()=>rerollBlock(id);
+ h.append(t,b);s.append(h);rows.forEach(r=>s.append(r));return s
+}
+function rf(block,field){
+ const maps={ant:{nature:'nature',fonction:'fonction',faction:'faction',rapport:'rapport',objectif:'objectif',motivation:'motivation',power:'power',technique:'technique',knowledge:'knowledge',particularity:'particularity'},
+ obj:{nature:'objectNature',origin:'objectOrigin',fonction:'objectFunction',link:'objectFunction',manifestation:'manifestation'},
+ char:{nature:'nature',fonction:'fonction',position:'thirdRole',objectif:'objectif',motivation:'motivation',info:'knowledge',secret:'reveal'},
+ third:{nature:'thirdNature',role:'thirdRole',objectif:'thirdObj',motivation:'thirdMot'}};
+ if(maps[block])S[block][field]=other(maps[block][field],S[block][field]);else S[block]=other(block,S[block]);
+ render()
+}
+function rerollBlock(id){
+ if(id==='ant')S.ant={nature:pick('nature'),fonction:pick('fonction'),faction:pick('faction'),rapport:pick('rapport'),objectif:pick('objectif'),motivation:pick('motivation'),power:pick('power'),technique:pick('technique'),knowledge:pick('knowledge'),particularity:pick('particularity')};
+ if(id==='obj')S.obj={nature:pick('objectNature'),origin:pick('objectOrigin'),fonction:pick('objectFunction'),link:pick('objectFunction'),manifestation:pick('manifestation')};
+ if(id==='char')S.char={nature:pick('nature'),fonction:pick('fonction'),position:pick('thirdRole'),objectif:pick('objectif'),motivation:pick('motivation'),info:pick('knowledge'),secret:pick('reveal')};
+ if(id==='third')S.third={nature:pick('thirdNature'),role:pick('thirdRole'),objectif:pick('thirdObj'),motivation:pick('thirdMot')};
+ render()
+}
 function render(){
-$("title").textContent=state.mission||"Mission A.E.G.I.S.";
-let rows=$("rows");rows.innerHTML="";
-fields.forEach(([id,label])=>{if(!state[id])return;let d=document.createElement("div");d.className="row";d.innerHTML='<div class="name">'+label+'</div><div class="value"></div><button class="reroll">↻</button>';d.querySelector(".value").textContent=state[id];d.querySelector("button").onclick=()=>reroll(id);rows.appendChild(d)});
-let n=+$("agents").value,du=+$("duration").value,g=$("genre").value;
-let density=n<=3?"une opposition principale et éventuellement un élément secondaire":n===4?"une opposition principale et un élément secondaire":n===5?"une opposition principale et un à deux éléments secondaires":"une opposition principale, deux éléments secondaires et éventuellement un mini-boss";
-let p="A.E.G.I.S. déploie "+n+" agents pour une opération de "+du+" heures, dans un registre "+g+". "+state.situation+" "+state.mission+" La situation implique "+state.antagonist.toLowerCase()+" dont l’objectif est de "+state.objective.charAt(0).toLowerCase()+state.objective.slice(1)+" Sur place se trouve "+state.location.toLowerCase()+", tandis que "+state.character.toLowerCase()+" détient ou connaît une partie des éléments utiles. "+state.power+" constitue la particularité surnaturelle centrale. La mission est compliquée par "+state.friction.toLowerCase()+". La révélation finale est la suivante : "+state.reveal.toLowerCase()+". La résolution attendue est : "+state.resolution.toLowerCase()+". La densité prévue pour cette équipe est "+density+".";
-if(state.third)p+=" Un troisième intervenant entre également en jeu : "+state.third.toLowerCase()+".";
-if(state.event)p+=" En cours d’opération, "+state.event.toLowerCase()+".";
-$("pitch").textContent=p;
+ const o=opt(),r=$('rows');r.innerHTML='';
+ $('title').textContent=makeTitle();
+ $('meta').textContent=`${$('agents').value} joueurs · ${$('duration').value} h · ${$('genre').value}`;
+ $('playerMeta').textContent='Joueurs : '+characterSummary();
+ const mr=(ob,b,defs)=>defs.map(x=>row(x[1],ob[x[0]],()=>rf(b,x[0])));
+ r.append(section('Cadre de mission',null,[row('Nature de la mission',S.mission,()=>rf('mission')),row('Situation de départ',S.situation,()=>rf('situation')),row('Lieu — nature',S.loc.nature,()=>rf('loc','nature')),row('Lieu — fonction',S.loc.fonction,()=>rf('loc','fonction')),row('Lieu — caractéristique',S.loc.feature,()=>rf('loc','feature'))]));
+ r.append(section('Antagoniste principal','ant',mr(S.ant,'ant',[['nature','Nature'],['fonction','Fonction'],['faction','Faction'],['rapport','Rapport à la faction'],['objectif','Objectif'],['motivation','Motivation'],['power','Pouvoir / capacité'],['technique','Technique utile'],['knowledge','Connaissance utile'],['particularity','Particularité']]));
+ r.append(section('Artefact / phénomène / objet','obj',mr(S.obj,'obj',[['nature','Nature'],['origin','Origine'],['fonction','Fonction'],['link','Lien avec l’affaire'],['manifestation','Manifestation']]));
+ r.append(section('Personnage clé','char',mr(S.char,'char',[['nature','Nature'],['fonction','Fonction'],['position','Position dans le conflit'],['objectif','Objectif'],['motivation','Motivation'],['info','Information détenue'],['secret','Secret éventuel']]));
+ r.append(section('Friction / contrainte opérationnelle',null,[row('Contrainte',S.friction,()=>rf('friction'))]));
+ r.append(section('Révélation',null,[row('Révélation',S.reveal,()=>rf('reveal'))],!o.reveal));
+ r.append(section('Résolution / enjeu final',null,[row('Type',S.res.type,()=>rf('res','type')),row('Objectif final',S.res.objective,()=>rf('res','objective')),row('Enjeu',S.res.stakes,()=>rf('res','stakes'))]));
+ r.append(section('Intervenant tiers','third',mr(S.third,'third',[['nature','Nature'],['role','Rôle dans le conflit'],['objectif','Objectif'],['motivation','Motivation']]),!o.third));
+ r.append(section('Événement intermédiaire','event',[row('Type',S.event.type,()=>rf('event','type')),row('Événement',S.event.text,()=>rf('event','text'))],!o.event));
+ $('story').innerHTML=story()
 }
-$("generate").onclick=generate;
-$("copy").onclick=async()=>{try{await navigator.clipboard.writeText($("pitch").textContent);$("copy").textContent="Copié";setTimeout(()=>$("copy").textContent="Copier",1200)}catch(e){}};
+function tone(){
+ let g=$('genre').value;
+ return g==='Horreur'?"La situation donne rapidement l’impression que le phénomène observe les agents.":g==='Enquête'?"Les premiers faits paraissent contradictoires, mais leur répétition dessine une logique.":g==='Exploration / Découverte / Lore'?"Chaque découverte ajoute une pièce à une histoire plus ancienne que l’intervention.":g==='Social / Éthique / Dilemme'?"Le danger ne suffit pas à désigner un camp : plusieurs intérêts peuvent être légitimes et incompatibles.":g==='Poétique / Étrange'?"L’affaire conserve une part d’étrangeté que les agents ne peuvent pas entièrement réduire à une explication rationnelle.":g==='Survie'?"Le terrain impose de rester opérationnel avant toute autre considération.":g==='Thriller / Course contre la montre'?"Le temps réduit progressivement la marge de manœuvre des agents.":"La situation privilégie l’action, les déplacements et les confrontations directes."
+}
+function story(){
+ let a=S.ant,o=S.obj,c=S.char,l=S.loc,x=S.res,t=S.third,e=S.event,p=`<h3>Situation et mandat</h3><p>A.E.G.I.S. déploie ${$('agents').value} agents pour ${lc(S.mission)} ${S.situation} ${tone()}</p>`;
+ p+=`<h3>Ce qui se joue réellement</h3><p>La force opposée est ${lc(a.nature)}, qui agit comme ${lc(a.fonction)}. ${a.faction} : ${lc(a.rapport)} Son objectif est de ${lc(a.objectif)}, motivé par ${lc(a.motivation)}. L’affaire tourne autour de ${lc(o.nature)}, d’origine ${lc(o.origin)}, dont la fonction est de ${lc(o.fonction)}.</p>`;
+ p+=`<h3>Terrain et acteurs</h3><p>Le dossier conduit les agents vers ${lc(l.nature)}. Le lieu sert de ${lc(l.fonction)} et ${lc(l.feature)} ${lc(c.nature)} intervient comme ${lc(c.fonction)} ; sa position est ${lc(c.position)}. Son objectif est de ${lc(c.objectif)}, motivé par ${lc(c.motivation)}.</p>`;
+ p+=`<h3>Confrontation</h3><p>La progression est compliquée par ${lc(S.friction)}. L’antagoniste dispose de ${lc(a.power)} et privilégie ${lc(a.technique)}. Il connaît ${lc(a.knowledge)}. Sa particularité est la suivante : ${lc(a.particularity)}.</p>`;
+ let oo=opt();
+ p+=`<h3>Résolution</h3><p>La situation doit finalement prendre la forme d’une ${x.type.toLowerCase()} : les agents doivent ${lc(x.objective)}. L’enjeu porte sur ${lc(x.stakes)}.</p>`;
+ p+=`<h3${oo.reveal?'':' class="optional"'}>Révélation${oo.reveal?'':' — OPTIONNEL'}</h3><p${oo.reveal?'':' class="optional"'}>${S.reveal}</p>`;
+ p+=`<h3${oo.third?'':' class="optional"'}>Intervenant tiers${oo.third?'':' — OPTIONNEL'}</h3><p${oo.third?'':' class="optional"'}>${t.nature} : ${t.role} Son objectif est de ${lc(t.objectif)}, pour ${lc(t.motivation)}.</p>`;
+ p+=`<h3${oo.event?'':' class="optional"'}>Événement intermédiaire${oo.event?'':' — OPTIONNEL'}</h3><p${oo.event?'':' class="optional"'}>${e.type} : ${e.text} Cet événement ne doit pas être nécessaire à la résolution, mais peut laisser un petit effet, un objet ou un écho jusqu’à la fin.</p>`;
+ return p
+}
+
+function developmentPrompt(billet){
+ const selectedCharacters=characterPrompt();
+ return `Tu es auteur et concepteur de scénarios pour A.E.G.I.S., un jeu de rôle d’action surnaturelle.
+
+À partir du billet opérationnel fourni à la fin de ce message, transforme ce matériau en un scénario complet, cohérent et directement exploitable par un meneur de jeu.
+
+Le billet est le socle du scénario : développe ce qui existe, ne repars pas de zéro.
+
+PERSONNAGES JOUEURS SÉLECTIONNÉS
+Les personnages ci-dessous sont les agents joueurs de cette mission. Ils sont tous différents. Respecte leur identité, leur âge apparent, leur morphologie, leur tenue, leurs accessoires et leurs particularités visuelles.
+
+${selectedCharacters}
+
+RÈGLES DE CONSERVATION
+- Conserve mission, nombre de joueurs, durée et tonalité.
+- Conserve les éléments établis concernant antagonistes, objectifs, motivations, pouvoirs, limites et particularités.
+- Conserve artefact/phénomène/objet, origine, fonction et rôle.
+- Conserve lieux, personnages, factions, intervenants et enjeux.
+- Ne supprime pas un élément inhabituel.
+- Les éléments OPTIONNELS ne deviennent jamais des conditions de victoire.
+- Ne crée pas une nouvelle intrigue principale remplaçant celle du billet.
+- Tu peux préciser et relier les éléments pour les rendre jouables.
+- Nettoie naturellement les formulations mécaniques, répétitions et maladresses sans modifier leur sens.
+- Si deux éléments semblent légèrement contradictoires, choisis l’interprétation demandant le moins de modifications.
+
+OBJECTIF
+Produis un véritable billet de scénario A.E.G.I.S., pas un résumé romancé.
+Le MJ doit comprendre rapidement ce qui se passe, ce que veulent les acteurs, ce que les agents peuvent découvrir et comment la situation évolue.
+
+COMPACTNESS
+Scénario dense et facilement consultable. Pas de remplissage atmosphérique. Environ 1500–2500 mots selon la durée.
+
+TITRE ET GENRE
+Le titre doit refléter le genre choisi et la promesse du scénario, pas seulement un lieu ou un objet. Le genre influence vocabulaire, rythme, tension et présentation sans modifier les faits établis.
+
+SYNOPSIS
+3 à 5 phrases maximum : situation, problème central, élément singulier et enjeux. Évocateur sans révéler la fin.
+
+STRUCTURE
+1. Titre
+2. Synopsis
+3. Situation initiale et mandat
+4. Ce que les agents savent
+5. Ce qui se passe réellement — MJ
+6. Antagoniste et forces opposées
+7. Artefact/phénomène/objet
+8. Lieu et terrain
+9. Personnages et factions
+10. Déroulement en scènes
+11. Informations et découvertes
+12. Confrontations et comportement tactique
+13. Intervenants tiers
+14. Événement intermédiaire
+15. Révélation éventuelle
+16. Confrontation finale
+17. Résolution, conditions de réussite et conséquences
+
+SCÈNES
+Prévois environ 3 à 6 scènes selon la durée.
+Chaque scène doit être une situation de jeu, pas simplement un lieu.
+
+Format :
+SCÈNE X — TITRE
+*Micro-description prête à lire aux joueurs, 2–3 lignes maximum, environ 40–50 mots, uniquement ce qui est immédiatement perceptible.*
+Situation
+Informations
+Actions possibles
+SORTIES NARRATIVES
+→ ACTION → conséquence immédiate → destination
+État de la situation : une phrase maximum.
+
+Les sorties peuvent être PROGRESSION, AVANTAGE, DÉSAVANTAGE ou BRANCHE.
+Plusieurs branches peuvent converger vers une même scène avec des conditions différentes.
+Ne prévois pas toutes les actions possibles : indique les choix importants et les approches raisonnables.
+Une autre solution cohérente trouvée par les joueurs doit produire une conséquence logique, pas être refusée pour revenir au chemin prévu.
+
+INDICES
+Une information importante ne dépend jamais d’un seul jet ou d’une seule action. Donne plusieurs moyens raisonnables de l’obtenir.
+
+ÉCHEC
+Un échec ne doit pas bloquer artificiellement le scénario. Il entraîne plutôt perte de temps, arrivée d’un adversaire, aggravation du phénomène, information incomplète, déplacement d’un acteur, nouvelle menace ou condition moins favorable.
+
+CONFRONTATIONS
+Pour les adversaires importants : objectif immédiat, comportement tactique, capacités utiles, limites/faiblesses établies, réaction à l’échec et possibilité de négociation. Pas de fiche complète inutile.
+
+OPTIONNELS
+Les éléments OPTIONNELS enrichissent le scénario mais ne conditionnent jamais la réussite.
+
+LIBERTÉ DES JOUEURS
+Ne suppose jamais que les agents combattront, suivront exactement les indices ou accepteront une solution proposée.
+
+ILLUSTRATION DE COUVERTURE
+Après le scénario, génère également une illustration de couverture directement liée à cette mission.
+
+${ART}
+
+Utilise impérativement les personnages joueurs sélectionnés et leurs descriptions visuelles. Ne remplace jamais un personnage sélectionné par un autre. Si plusieurs agents sont représentés, le nombre doit correspondre au groupe sélectionné. Aucun personnage n’est automatiquement central : compose l’image selon le scénario.
+
+L’image doit montrer le concept central, le lieu, l’atmosphère et la menace ou le phénomène surnaturel sans révéler la résolution, le véritable coupable, une identité secrète ou un retournement final. Un élément de fin peut être omis, partiellement cadré ou rendu non reconnaissable.
+
+À la fin, ajoute « Points à improviser » avec uniquement les détails librement adaptables par le MJ.
+
+Voici le billet A.E.G.I.S. à développer :
+
+--- DÉBUT DU BILLET ---
+${billet}
+--- FIN DU BILLET ---`
+}
+
+async function copyText(text,button,label){
+ try{await navigator.clipboard.writeText(text)}
+ catch(e){let ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}
+ button.textContent='Copié';setTimeout(()=>button.textContent=label,1400)
+}
+
+$('generate').onclick=()=>{try{generateScenario()}catch(e){$('result').classList.remove('hidden');$('story').innerHTML='<h3>Erreur</h3><p>'+esc(e.message)+'</p>'}};
+$('copy').onclick=function(){copyText($('story').innerText,this,'Copier le billet')};
+$('copyPrompt').onclick=function(){copyText(developmentPrompt($('story').innerText),this,'Copier billet + prompt')};
+$('agents').onchange=updatePlayerSelectors;
+updatePlayerSelectors();
 </script>
 </body>
 </html>
