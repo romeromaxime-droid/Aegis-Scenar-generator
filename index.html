@@ -27,7 +27,7 @@ const ROLES=['Antagoniste','Lieutenant','Chef','Agent de terrain','Garde','Infor
 let currentNpc=null,currentScenario=null;
 function fill(id,arr){$(id).innerHTML=arr.map(x=>`<option>${esc(Array.isArray(x)?x[0]:x)}</option>`).join('')}
 fill('npcNature',NATURES);fill('npcFunction',FUNCTIONS);fill('npcFaction',Object.keys(FACTIONS));
-function updatePlayers(){const n=+$('agents').value,box=$('playerSelectors'),old=[...box.querySelectorAll('select')].map(s=>s.value);box.innerHTML='';for(let i=0;i<n;i++){const l=document.createElement('label');l.textContent='Joueur '+(i+1);const s=document.createElement('select');s.innerHTML='<option value="">— Choisir —</option>'+Object.keys(CHARACTERS).map(k=>`<option value="${k}">${esc(CHARACTERS[k].fullName)}</option>`).join('');if(old[i])s.value=old[i];l.append(s);box.append(l)}refreshPlayers()}
+function updatePlayers(){const n=+$('agents').value,box=$('playerSelectors'),old=[...box.querySelectorAll('select')].map(s=>s.value);box.innerHTML='';for(let i=0;i<n;i++){const l=document.createElement('label');l.textContent='Joueur '+(i+1);const s=document.createElement('select');s.innerHTML='<option value="">— Choisir —</option>'+Object.keys(CHARACTERS).map(k=>`<option value="${k}">${esc(CHARACTERS[k].fullName)}</option>`).join('');if(old[i])s.value=old[i];s.addEventListener('change',refreshPlayers);l.append(s);box.append(l)}refreshPlayers()}
 function refreshPlayers(){const ss=[...document.querySelectorAll('#playerSelectors select')],used=ss.map(s=>s.value).filter(Boolean);ss.forEach(s=>[...s.options].forEach(o=>{o.disabled=!!o.value&&used.includes(o.value)&&o.value!==s.value}))}
 $('agents').onchange=updatePlayers;updatePlayers();document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tabpanel').forEach(x=>x.classList.add('hidden'));b.classList.add('active');$(b.dataset.tab).classList.remove('hidden')});
 function selectedPlayers(){const v=[...document.querySelectorAll('#playerSelectors select')].map(s=>s.value);if(v.some(x=>!x)||new Set(v).size!==v.length)throw Error('Sélectionne un personnage différent pour chaque joueur.');return v}
@@ -182,8 +182,6 @@ Mission : ${s.mission}
 Situation : ${s.situation}
 Friction : ${s.friction}
 Force opposée : ${s.nature} — ${s.fun} — ${s.faction}
-Emblème : ${FACTIONS[s.faction].s}
-Couleurs / bannière : ${FACTIONS[s.faction].c}
 Révélation à ne pas montrer directement : ${s.reveal}
 
 PERSONNAGES JOUEURS
@@ -205,7 +203,6 @@ Le titre « ${s.title} » doit être traité comme un véritable titre pulp de c
 COMPOSITION
 Créer une scène de couverture qui raconte visuellement la mission et la menace sans révéler la résolution ni les secrets du scénario. Les personnages joueurs peuvent apparaître lorsqu’ils servent la composition, en respectant strictement leur identité, leur morphologie, leur âge apparent, leur équipement et leur description visuelle. La force opposée peut être identifiable sans nécessairement être montrée frontalement.
 
-Intégrer naturellement l’emblème de la faction dans le décor sous forme d’icône graphique simplifiée : bannière, fanion, écusson, sceau, véhicule, architecture ou autre élément diégétique. L’emblème de faction doit rester distinct du logo A.E.G.I.S. et ne doit pas devenir le logo principal de la couverture.
 
 Hiérarchie visuelle : logo A.E.G.I.S. en haut → scène principale et personnages → titre du scénario intégré à la composition. Aucun slogan, sous-titre, mention de genre, crédit, encadré ou texte supplémentaire. Le seul texte autorisé est le logo A.E.G.I.S. et le titre exact « ${s.title} ».
 
